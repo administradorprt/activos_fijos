@@ -43,7 +43,7 @@ class HerramientasController extends Controller
 				})->whereIn('activos.sucursal_id',$sucursales)->whereIn('id_tipo',$tipos)
                 ->select("activos.id","num_equipo","activos.estado","descripcion","marca","serie as codigo","modelo","tipos.nombre","created_user")
 				->paginate(10); */
-                $Herramientas=Activo::with(['sucursal'=>fn($suc)=>$suc->with('empresa:id_empresa,alias')])->search($querry)->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->whereIn('tipo_id',$tipos)->paginate(10);
+                $Herramientas=Activo::with(['sucursal'=>fn($suc)=>$suc->with('empresa:id_empresa,alias')])->search($querry)->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->whereIn('tipo_id',$tipos)->orderBy('id','ASC')->paginate(10);
 			}else{
                 $Herramientas=Activo::leftJoin('tipos', 'activos.tipo_id', '=', 'tipos.id_tipo')->
                 where('created_user', '=', auth()->user()->id)
@@ -200,6 +200,7 @@ class HerramientasController extends Controller
     	$Herramientas->garantia=$request->get('garantia');
         $Herramientas->precio_venta=$request->get('precio_venta');
 		$Herramientas->estatus_depreciacion=$request->get('estatus_depreciacion');
+        $Herramientas->sucursal_id=$request->get('sucursal_origen');
     	if($request->hasFile('xml')){
     		$file=$request->file('xml');
     		$file->storeAs('/archivos/inventario/Herramientas/xml/',$Herramientas->id."-".$file->getClientOriginalName(),'public');
