@@ -14,6 +14,7 @@
 				<thead>
 					<th>ID</th>
 					<th>Numero de equipo</th>
+					<th>Sucursal</th>
 					<th>Estado</th>
 					<th>Descripcion</th>
 					<th>Marca</th>
@@ -27,8 +28,11 @@
 				@foreach ($Herramientas as $tras)
 					@if(auth()->user()->role_id<3 || auth()->user()->id == $tras->created_user)
 						<tr>
-							<td>{{$tras->id_equipo_herramienta}}</td>	
+							<td>{{$tras->id}}</td>	
 							<td>{{$tras->num_equipo}}</td>
+							<td>
+								{{$tras->sucursal->empresa->alias}} - {{$tras->sucursal->nombre}}
+							</td>
 							<td>
 								@if($tras->estado==1)
 								Activo
