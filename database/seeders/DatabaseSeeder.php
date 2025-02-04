@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             GiroSeeder::class,
             EstadosDepreciacionSeeder::class,
+            ConfigTableSeeder::class,
         ]);   
     }
 }
