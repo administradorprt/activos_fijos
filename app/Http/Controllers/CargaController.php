@@ -13,9 +13,16 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportEquipo;
+use App\Models\Activo;
+use App\Models\Tipo;
+use Illuminate\Support\Facades\Auth;
 
 class CargaController extends Controller
 {
+    public $sucursales;
+    public function __construct() {
+        $this->sucursales=Auth::user()->empleado->sucursales;
+    }
     public function index()
     {
     	return view('inventario.Carga.index');
@@ -754,11 +761,13 @@ class CargaController extends Controller
     public function index_her()
     {
     	$respuesta='';
-    	return view('inventario.Carga.index_her', ["Respuesta"=>$respuesta]);
+    	return view('inventario.Carga.index_her', ["Respuesta"=>$respuesta,"sucursales"=>$this->sucursales]);
     }
     public function importar_her(Request $request)
     {
         try {
+            $request->validate(['sucursal'=>'required']);
+            $sucursal=$request->get('sucursal');
             $arr_conf= CargaController::config_default();
             $errors='';
             $null= null;
@@ -884,24 +893,24 @@ class CargaController extends Controller
                 $registros=0;
                 $hoy = date("Y-m-d");
                 foreach ($fila as $row) {
-                    $Equipo= new Herramientas;
+                    $Equipo= new Activo();
                     $Equipo->estado=$row['estado'];
                     $Equipo->descripcion=$row['descripcion'];
                     $Equipo->marca=$row['marca'];
-                    $Equipo->codigo=$row['codigo'];
+                    $Equipo->serie=$row['codigo'];
                     $Equipo->modelo=$row['modelo'];
                     $Equipo->medida=$row['medida'];
                     $Equipo->color=$row['color'];
-                    $Equipo->tipo=$row['tipo'];
+                    $Equipo->tipo_id=$row['tipo'];
                     $Equipo->costo=$row['costo'];
                     $Equipo->nombre_provedor=$row['nombre_provedor'];
                     $Equipo->num_factura=$row['num_factura'];
                     $Equipo->fecha_compra=$row['fecha_compra'];
                     $Equipo->tasa_depreciacion=$row['tasa_depreciacion'];
                     $Equipo->vida_util=$row['vida_util'];
-                    $Equipo->area_destinada=$row['area_destinada'];
-                    $Equipo->puesto=$row['puesto'];
-                    $Equipo->nombre_responsable=$row['nombre_responsable'];
+                    $Equipo->departamento_id=$row['area_destinada'];
+                    $Equipo->puesto_id=$row['puesto'];
+                    $Equipo->responsable_id=$row['nombre_responsable'];
                     $Equipo->fecha_baja=$row['fecha_baja'];
                     $Equipo->motivo_baja=$row['motivo_baja'];
                     $Equipo->observaciones=$row['observaciones'];
@@ -914,9 +923,14 @@ class CargaController extends Controller
                     $Equipo->estatus_depreciacion=$row['estatus_depreciacion'];
                     $Equipo->masivo=$hoy;
                     $Equipo->created_user=auth()->user()->id;
+                    $Equipo->sucursal_id=$sucursal;
                     $Equipo->save();
-                    $id=$Equipo->id_equipo_herramienta;
-                    $Equipo->num_equipo='HER-'.$Equipo->id_equipo_herramienta;
+
+                    //buscamos las herramientas para definir el num de herramienta de la sucursal
+                    $tipos=Tipo::where('id_giro',5)->where('sucursal_id',$sucursal)->get()->pluck('id_tipo');
+                    $cont=Activo::where('sucursal_id',$sucursal)->whereIn('tipo_id',$tipos)->get()->count();
+                    //$id=$Equipo->id_equipo_herramienta;
+                    $Equipo->num_equipo='HER-'.($cont+1);
 		            $Equipo->update();
                     $registros++;
                 }              
