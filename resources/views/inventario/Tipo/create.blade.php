@@ -29,7 +29,18 @@
 						</select>
 					</div>
 				</div>
-	
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+					<div class="form-group">
+						<label for="sucursal">Sucursal</label>
+						<select name="sucursal" class="form-control">
+							<option value="" hidden>Seleccionar sucursal</option>
+							@foreach($sucursales as $suc )
+								<option value="{{$suc->id_sucursal}}">{{$suc->empresa->alias}} - {{$suc->nombre}} </option>
+							@endforeach
+							
+						</select>
+					</div>
+				</div>
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 					<div class="form-group">
 						<label for="nombre">Nombre</label>
@@ -37,11 +48,11 @@
 					</div>
 				</div>
 	
-				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-					<div class="form-group">
-						<button class="btn btn-primary" type="submit" >Guardar</button>
-							<a href="{{ URL::previous() }}"><button class="btn btn-danger" type="button" >Cancelar</button></a>
-					</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
+					<button class="btn btn-primary" type="submit" >Guardar</button>
+						<a href="{{ URL::previous() }}"><button class="btn btn-danger" type="button" >Cancelar</button></a>
 				</div>
 			</div>
 		</form>

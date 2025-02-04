@@ -51,7 +51,18 @@
 					</select>
 				</div>
 			</div>
-
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
+					<label for="sucursal">Sucursal</label>
+					<select name="sucursal" class="form-control">
+						@foreach ($sucursales as $suc)
+							@if ($suc->id_sucursal==$Tipo->sucursal_id)
+								<option value="{{$suc->id_sucursal}}" selected>{{$suc->empresa->alias}} - {{$suc->nombre}}</option>
+							@endif
+						@endforeach
+					</select>
+				</div>
+			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
 					<label for="nombre">Nombre</label>

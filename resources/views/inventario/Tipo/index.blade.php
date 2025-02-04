@@ -12,6 +12,7 @@
 			<table class="table table-striped table-bordered table-condesed table-hover">
 				<thead>
 					<th>ID</th>
+					<th>Sucursal</th>
 					<th>Nombre</th>
 					<th>Giro</th>
 					<th>Opciones</th>
@@ -19,8 +20,9 @@
 				@foreach ($Tipo as $tras)
 				<tr>
 					<td>{{$tras->id_tipo}}</td>
+					<td>{{$tras->sucursal->empresa->alias}} - {{$tras->sucursal->nombre}}</td>
 					<td>{{$tras->nombre}}</td>
-					<td>{{$tras->giro_nombre}}</td>
+					<td>{{$tras->giro->nombre}}</td>
 					<td>
 						<a href="/admin/inventario/Tipo/{{$tras->id_tipo}}/edit"><button class="btn btn-info">Editar</button></a>
 						@if($tras->estado==1)
