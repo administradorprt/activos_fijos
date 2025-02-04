@@ -30,11 +30,10 @@ class HerramientasController extends Controller
     	if($request)
     	{
     		$querry=trim($request->get('searchText'));
-            $sucursales=Auth::user()->empleado->sucursales->pluck('id_sucursal');
-            //dd(Tipo::all()->last());
-            $tipos=Tipo::where('id_giro',5)->whereIn('sucursal_id',$sucursales)->get()->pluck('id_tipo');
+            $sucursales=Auth::user()->empleado->sucursales;
+            $tipos=Tipo::where('id_giro',5)->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->get()->pluck('id_tipo');
             if(auth()->user()->role_id<3){
-				$Herramientas=Activo::leftJoin('tipos', 'activos.tipo_id', '=', 'tipos.id_tipo')->
+				/* $Herramientas=Activo::leftJoin('tipos', 'activos.tipo_id', '=', 'tipos.id_tipo')->
 				Where(function ($query) use($querry){
 					$query->where('serie','LIKE','%'.$querry.'%')
 					->orWhere('activos.id','LIKE','%'.$querry.'%')
@@ -43,7 +42,8 @@ class HerramientasController extends Controller
 					->orWhere('tipos.nombre','LIKE','%'.$querry.'%');
 				})->whereIn('activos.sucursal_id',$sucursales)->whereIn('id_tipo',$tipos)
                 ->select("activos.id","num_equipo","activos.estado","descripcion","marca","serie as codigo","modelo","tipos.nombre","created_user")
-				->paginate(10);
+				->paginate(10); */
+                $Herramientas=Activo::with(['sucursal'=>fn($suc)=>$suc->with('empresa:id_empresa,alias')])->search($querry)->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->whereIn('tipo_id',$tipos)->paginate(10);
 			}else{
                 $Herramientas=Activo::leftJoin('tipos', 'activos.tipo_id', '=', 'tipos.id_tipo')->
                 where('created_user', '=', auth()->user()->id)
@@ -56,7 +56,7 @@ class HerramientasController extends Controller
 				})->select("id_equipo_herramienta","num_equipo","herramientas.estado","descripcion","marca","codigo","modelo","tipos.nombre","created_user")
 				->paginate(10);
             }
-    		return view('inventario.Herramientas.index',["Herramientas"=>$Herramientas,"searchText"=>$querry]);
+    		return view('inventario.Herramientas.index',["Herramientas"=>$Herramientas,"searchText"=>$querry,'sucursales'=>$sucursales]);
     	}
     }
     public function create()
