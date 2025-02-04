@@ -22,7 +22,8 @@ class TipoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'sucursal'=>'required',
+            'nombre'=>'required|string',
         ];
     }
 }
