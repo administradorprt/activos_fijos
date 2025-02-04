@@ -33,6 +33,15 @@
 								<div class="panel-body">
 									<p>
 										<div class="form-group">
+											<label for="sucursal">Sucursal origen</label>
+											<select name="sucursal" class="form-control"  required="">
+												<option value="" hidden>Seleccione una sucursal</option>
+												@foreach($sucursales as $sucursal )
+													<option  value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+												@endforeach
+											</select>
+										</div>
+										<div class="form-group">
 											<label for="giro">Categoria Equipo de Herramientas</label>
 											<input type="file" name="archivo_excel" id='archivo_excel' class="form-control" accept=".xls,.xlsx" >
 										</div>
