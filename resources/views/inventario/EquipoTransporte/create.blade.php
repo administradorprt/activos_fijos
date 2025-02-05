@@ -131,6 +131,17 @@
 					<div ng-app="myApp" ng-controller="namesCtrl">
 						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 							<div class="form-group">
+								<label for="sucursal_origen">Sucursal origen</label>
+								<select name="sucursal_origen" class="form-control"  required="">
+									<option value="" hidden>Seleccione una sucursal</option>
+									@foreach($sucursales as $sucursal )
+										<option  value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+									@endforeach
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+							<div class="form-group">
 								<label for="area_destinada">Área Destinada</label>
 								<select name="area_destinada" class="form-control" ng-model="depa"  required="">
 									@foreach($Departamento as $dep )
@@ -159,7 +170,7 @@
 							angular.module('myApp', []).controller('namesCtrl', function($scope) {
 								$scope.Empleado = [
 									@foreach($Empleado as $emp )
-										{nombre:'{{$emp->nombre}} {{$emp->apellido_paterno}} {{$emp->apellido_materno}}',id_puesto:'{{$emp->id_puesto}}',id_empleado:'{{$emp->id_empleado}}'},
+										{nombre:'{{$emp->nombres}} {{$emp->apellido_p}} {{$emp->apellido_m}}',id_puesto:'{{$emp->id_puesto}}',id_empleado:'{{$emp->id_empleado}}'},
 									@endforeach
 								];
 								$scope.Departamento = [

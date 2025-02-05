@@ -2,7 +2,7 @@
 @section('contenido')
 <div class="row">
 	<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-		<h3>Editar Equipo de Transporte: {{$EquipoTransporte->id_equipo_transporte}}</h3>
+		<h3>Editar Equipo de Transporte: {{$EquipoTransporte->id}}</h3>
 		@if(count($errors)>0)
 			<div class="alert alert-danger">
 				<ul>
@@ -12,7 +12,7 @@
 				</ul>
 			</div>
 		@endif
-		<form action="{{route('EquipoTransporte.update',$EquipoTransporte->id_equipo_transporte)}}" method="post" enctype="multipart/form-data">
+		<form action="{{route('EquipoTransporte.update',$EquipoTransporte->id)}}" method="post" enctype="multipart/form-data">
 			@method('PATCH')
 			@csrf
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -44,7 +44,7 @@
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
 					<label for="vin">Vin</label>
-					<input type="text" name="vin" class="form-control" placeholder="Vin" maxlength="17" required  value="{{$EquipoTransporte->vin}}">
+					<input type="text" name="vin" class="form-control" placeholder="Vin" maxlength="17" required  value="{{$EquipoTransporte->serie}}">
 				</div>
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -133,7 +133,7 @@
 					<label for="xml">Xml</label>
 					<input type="file" name="xml" class="form-control" accept="application/xml">
 					@if($EquipoTransporte->xml!="")
-						<A HREF="{{asset('archivos/inventario/EquipoTransporte/xml/'.$EquipoTransporte->xml)}}" target="_blank"><input type="button"  class="form-control" value="ver xml"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoTransporte/xml/'.$EquipoTransporte->xml)}}" target="_blank"><input type="button"  class="form-control" value="ver xml"></A>
 					@else
 					<input type="text"  class="form-control" value="no hay xml" readonly="">
 					@endif
@@ -144,10 +144,24 @@
 					<label for="pdf">Pdf</label>
 					<input type="file" name="pdf" class="form-control" accept="application/pdf">
 					@if($EquipoTransporte->pdf!="")
-						<A HREF="{{asset('archivos/inventario/EquipoTransporte/pdf/'.$EquipoTransporte->pdf)}}" target="_blank"><input type="button"  class="form-control" value="ver pdf"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoTransporte/pdf/'.$EquipoTransporte->pdf)}}" target="_blank"><input type="button"  class="form-control" value="ver pdf"></A>
 					@else
 					<input type="text" class="form-control" value="no hay pdf" readonly="">
 					@endif
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
+					<label for="sucursal_origen">Sucursal origen</label>
+					<select name="sucursal_origen" class="form-control" >
+						@foreach($sucursales as $sucursal )
+							@if($sucursal->id_sucursal== $EquipoTransporte->sucursal_id)
+								<option selected value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+							@else
+								<option value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+							@endif
+						@endforeach
+					</select>
 				</div>
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -184,10 +198,10 @@
 					<label for="nombre_responsable">Nombre del Responsable</label>
 					<select name="nombre_responsable" class="form-control" >
 						@foreach($Empleado as $emp )
-							@if($emp->id_empleado== $EquipoTransporte->nombre_responsable)
-								<option selected value="{{$emp->id_empleado}}"> {{$emp->apellido_paterno}} {{$emp->apellido_materno}} {{$emp->nombre}}</option>
+							@if($emp->id_empleado== $EquipoTransporte->responsable_id)
+								<option selected value="{{$emp->id_empleado}}"> {{$emp->apellido_p}} {{$emp->apellido_m}} {{$emp->nombres}}</option>
 							@else
-								<option value="{{$emp->id_empleado}}"> {{$emp->apellido_paterno}} {{$emp->apellido_materno}} {{$emp->nombre}}</option>
+								<option value="{{$emp->id_empleado}}"> {{$emp->apellido_p}} {{$emp->apellido_m}} {{$emp->nombres}}</option>
 							@endif
 						@endforeach
 						

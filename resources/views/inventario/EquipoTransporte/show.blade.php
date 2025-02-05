@@ -2,7 +2,7 @@
 @section('contenido')
 <div class="row">
 	<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-		<h3>Equipo de Transporte: {{$EquipoTransporte->id_equipo_transporte}}</h3>
+		<h3>Equipo de Transporte: {{$EquipoTransporte->id}}</h3>
 		@if(count($errors)>0)
 			<div class="alert alert-danger">
 				<ul>
@@ -12,7 +12,7 @@
 				</ul>
 			</div>
 		@endif
-		<form action="{{route('EquipoTransporte.show',$EquipoTransporte->id_equipo_transporte)}}" method="get">
+		<form action="{{route('EquipoTransporte.show',$EquipoTransporte->id)}}" method="get">
 			@csrf
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
@@ -127,7 +127,7 @@
 					<label for="xml">Xml</label>
 					<!--<input type="file" name="xml" class="form-control" >-->
 					@if($EquipoTransporte->xml!="")
-						<A HREF="{{asset('archivos/inventario/EquipoTransporte/xml/'.$EquipoTransporte->xml)}}" target="_blank"><input type="button" name="xml" class="form-control" value="ver xml"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoTransporte/xml/'.$EquipoTransporte->xml)}}" target="_blank"><input type="button" name="xml" class="form-control" value="ver xml"></A>
 					@else
 					<input type="text" name="xml" class="form-control" value="no hay xml" readonly="">
 					@endif
@@ -138,7 +138,7 @@
 					<label for="pdf">Pdf</label>
 					@if($EquipoTransporte->pdf!="")
 						
-						<A HREF="{{asset('archivos/inventario/EquipoTransporte/pdf/'.$EquipoTransporte->pdf)}}" target="_blank"><input type="button" name="pdf" class="form-control" value="ver PDF"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoTransporte/pdf/'.$EquipoTransporte->pdf)}}" target="_blank"><input type="button" name="pdf" class="form-control" value="ver PDF"></A>
 					@else
 					<input type="text" name="pdf" class="form-control" value="no hay pdf" readonly="">
 					@endif
@@ -158,9 +158,19 @@
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
+					<label for="sucursal_origen">Sucursal origen</label>
+					@foreach($sucursales as $sucursal )
+						@if($sucursal->id_sucursal== $EquipoTransporte->sucursal_id)
+							<input type="text" name="sucursal_origen" class="form-control" placeholder="sucursal_origen" value="{{$sucursal->empresa->alias}} - {{$sucursal->nombre}}" readonly="">
+						@endif
+					@endforeach
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
 					<label for="area_destinada">Area Destinada</label>
 					@foreach($Departamento as $dep )
-						@if($dep->id_departamento== $EquipoTransporte->area_destinada)
+						@if($dep->id_departamento== $EquipoTransporte->departamento_id)
 						<input type="text" name="area_destinada" class="form-control" placeholder="area_destinada" value="{{$dep->nombre}}" readonly="">
 						@endif
 					@endforeach
@@ -171,7 +181,7 @@
 				<div class="form-group">
 					<label for="puesto">Puesto</label>
 					@foreach($Puesto as $pues )
-						@if($pues->id_puesto== $EquipoTransporte->puesto)
+						@if($pues->id_puesto== $EquipoTransporte->puesto_id)
 						<input type="text" name="puesto" class="form-control" placeholder="puesto" value="{{$pues->nombre}} " readonly="">
 						
 						@endif
@@ -182,8 +192,8 @@
 				<div class="form-group">
 					<label for="nombre_responsable">Nombre del Responsable</label>
 					@foreach($Empleado as $Emp )
-						@if($Emp->id_empleado== $EquipoTransporte->nombre_responsable)
-						<input type="text" name="nombre_responsable" class="form-control" placeholder="nombre_responsable" value="{{$Emp->nombre}} {{$Emp->apellido_paterno}} {{$Emp->apellido_materno}}" readonly="">
+						@if($Emp->id_empleado== $EquipoTransporte->responsable_id)
+						<input type="text" name="nombre_responsable" class="form-control" placeholder="nombre_responsable" value="{{$Emp->nombres}} {{$Emp->apellido_p}} {{$Emp->apellido_m}}" readonly="">
 						@endif
 					@endforeach
 				</div>
@@ -216,7 +226,7 @@
 				<div class="form-group">
 					<label for="carta_responsiva">Carta Responsiva</label>
 					@if($EquipoTransporte->carta_responsiva!="")	
-						<A HREF="{{asset('archivos/inventario/EquipoTransporte/carta_responsiva/'.$EquipoTransporte->carta_responsiva)}}" target="_blank"><input type="button" name="carta_responsiva" class="form-control" value="ver carta responsiva"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoTransporte/carta_responsiva/'.$EquipoTransporte->carta_responsiva)}}" target="_blank"><input type="button" name="carta_responsiva" class="form-control" value="ver carta responsiva"></A>
 					@else
 					<input type="text" name="carta_responsiva" class="form-control" value="no hay carta responsiva" readonly="">
 					@endif
@@ -256,7 +266,7 @@
 					<a href="/admin/inventario/EquipoTransporte"><button class="btn btn-danger" type="button" >Atras</button></a>
 				</div>
 				<div class="form-group">
-					<a href="/admin/inventario/EquipoTransporte/Responsiva/{{$EquipoTransporte->id_equipo_transporte}}" target="_blank"><button class="btn btn-success" type="button" >Imprimir Responsiva</button></a>
+					<a href="/admin/inventario/EquipoTransporte/Responsiva/{{$EquipoTransporte->id}}" target="_blank"><button class="btn btn-success" type="button" >Imprimir Responsiva</button></a>
 				</div>
 			</div>
 		</form>
