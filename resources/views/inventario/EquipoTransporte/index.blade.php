@@ -12,6 +12,7 @@
 			<table class="table table-striped table-bordered table-condesed table-hover">
 				<thead>
 					<th>ID</th>
+					<th>Sucursal</th>
 					<th>Numero de equipo</th>
 					<th>Estado</th>
 					<th>Descripcion</th>
@@ -25,7 +26,8 @@
 				@foreach ($EquipoTransporte as $tras)
 					@if(auth()->user()->role_id<3 || auth()->user()->id == $tras->created_user)
 						<tr>
-							<td>{{$tras->id_equipo_transporte}}</td>	
+							<td>{{$tras->id}}</td>
+							<td>{{$tras->sucursal->empresa->alias}} - {{$tras->sucursal->nombre}}</td>	
 							<td>{{$tras->num_equipo}}</td>
 							<td>
 								@if($tras->estado==1)
@@ -41,20 +43,20 @@
 							<td>{{$tras->nombre}}</td>
 							<td>
 								@php
-									$serversUser = \App\Models\Imagen::where('id_equipo', '=', $tras->id_equipo_transporte)->where('id_area', '=', 1)->take(1)->get();
+									$serversUser = \App\Models\Imagen::where('activo_id', '=', $tras->id)->take(1)->get();
 								@endphp
 								@foreach ($serversUser as $ser)
 									<img src="{{asset('imagenes/inventario/EquipoTransporte/img/'.$ser->imagen)}}" alt="{{$tras->descripcion}}" height="100px" width="100px" class="img-thumbnail">	
 								@endforeach
 							</td>
 							<td>
-								<a href="{{route('EquipoTransporte.show', ['EquipoTransporte' => $tras->id_equipo_transporte])}}"><button class="btn btn-info">Ver</button></a>
-								<a href="{{route('EquipoTransporte.edit',['EquipoTransporte' => $tras->id_equipo_transporte])}}"><button class="btn btn-info">Editar</button></a>
+								<a href="{{route('EquipoTransporte.show', ['EquipoTransporte' => $tras->id])}}"><button class="btn btn-info">Ver</button></a>
+								<a href="{{route('EquipoTransporte.edit',['EquipoTransporte' => $tras->id])}}"><button class="btn btn-info">Editar</button></a>
 							
 								@if($tras->estado==1)
-									<a href="" data-target="#modal-delete-{{$tras->id_equipo_transporte}}" data-toggle="modal"><button class="btn btn-danger">Baja</button></a>
+									<a href="" data-target="#modal-delete-{{$tras->id}}" data-toggle="modal"><button class="btn btn-danger">Baja</button></a>
 								@else
-									<a href="" data-target="#modal-activate-{{$tras->id_equipo_transporte}}" data-toggle="modal"><button class="btn btn-success">Activar</button></a>
+									<a href="" data-target="#modal-activate-{{$tras->id}}" data-toggle="modal"><button class="btn btn-success">Activar</button></a>
 								@endif
 								@if(auth()->user()->role_id == 1 || auth()->user()->role_trans == 2)
 							
