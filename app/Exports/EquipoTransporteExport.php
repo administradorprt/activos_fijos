@@ -2,9 +2,12 @@
 
 namespace App\Exports;
 
+use App\Models\Activo;
 use App\Models\EquipoTransporte;
+use App\Models\Tipo;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -28,6 +31,10 @@ class EquipoTransporteExport implements FromQuery, ShouldAutoSize, WithMapping,W
     }*/
     use Exportable;
 
+    public $sucursales;
+    public function __construct() {
+        $this->sucursales=Auth::user()->empleado->sucursales;
+    }
     public function forState(int $state)
     {
         $this->state = $state;
@@ -36,20 +43,21 @@ class EquipoTransporteExport implements FromQuery, ShouldAutoSize, WithMapping,W
     }
     public function query()
     {
+        $tipos=Tipo::where('id_giro',1)->whereIn('sucursal_id',$this->sucursales->pluck('id_sucursal'))->get()->pluck('id_tipo');
         switch ($this->state) {
             case '1':
-                return EquipoTransporte::query();
+                return Activo::query()->whereIn('tipo_id',$tipos);
                 break;
             
             case '2':
-                return EquipoTransporte::query()->where("estado","=",0);
+                return Activo::query()->whereIn('tipo_id',$tipos)->where("estado","=",0);
                 break;
 
             case '3':
-                return EquipoTransporte::query()->where("estado","=",1);
+                return Activo::query()->whereIn('tipo_id',$tipos)->where("estado","=",1);
                 break;
         }
-        return EquipoTransporte::query();
+        return Activo::query()->whereIn('tipo_id',$tipos);
     }   
     public function map($invoice): array
     {
@@ -58,7 +66,7 @@ class EquipoTransporteExport implements FromQuery, ShouldAutoSize, WithMapping,W
             $invoice->descripcion,
             $invoice->estado ? 'activo':'inactivo',
             $invoice->marca,
-            $invoice->vin,
+            $invoice->serie,
             $invoice->modelo,
             $invoice->num_motor,
             $invoice->color,
@@ -70,9 +78,9 @@ class EquipoTransporteExport implements FromQuery, ShouldAutoSize, WithMapping,W
             Date::PHPToExcel($invoice->fecha_compra),//$invoice->fecha_compra,
             $invoice->tasa_depreciacion,
             $invoice->vida_util,
-            $invoice->empleado->nombre." ".$invoice->empleado->apellido_paterno,
-            $invoice->area->nombre,
-            $invoice->puestos->nombre??'',
+            isset($invoice->empleado)?$invoice->empleado->nombres." ".$invoice->empleado->apellido_p:'Sin asignar',
+            $invoice->area->nombre??'Sin área',
+            $invoice->puestos->nombre??'Sin puesto',
             Date::PHPToExcel($invoice->fecha_baja),
             $invoice->motivo_baja,
             $invoice->observaciones,

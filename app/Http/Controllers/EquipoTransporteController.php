@@ -16,21 +16,30 @@ use Illuminate\Support\Facades\Redirect;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Illuminate\Support\Facades\Validator;
 use App\Exports\EquipoTransporteExport;
+use App\Models\Activo;
+use App\Models\Puesto;
+use App\Models\Sucursales;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 
 class EquipoTransporteController extends Controller
 {
+	private $sucUsers;
     public function __construct()
     {
+		$this->sucUsers=Auth::user()->empleado->sucursales;
     }
     public function index(Request $request)
     {
     	if($request)
     	{
     		$querry=trim($request->get('searchText'));
+			$sucursales=$this->sucUsers;
+			$tipos=Tipo::where('id_giro',1)->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->get()->pluck('id_tipo');
 			if(auth()->user()->role_id<3){
-				$equipotransporte=EquipoTransporte::leftJoin('tipos', 'equipo_transporte.tipo', '=', 'tipos.id_tipo')->
+				/* $equipotransporte=EquipoTransporte::leftJoin('tipos', 'equipo_transporte.tipo', '=', 'tipos.id_tipo')->
 				Where(function ($query) use($querry){
 					$query->where('vin','LIKE','%'.$querry.'%')
 					->orWhere('id_equipo_transporte','LIKE','%'.$querry.'%')
@@ -38,9 +47,10 @@ class EquipoTransporteController extends Controller
 					->orWhere('num_equipo','LIKE','%'.$querry.'%')
 					->orWhere('tipos.nombre','LIKE','%'.$querry.'%');
 				})->select("id_equipo_transporte","num_equipo","equipo_transporte.estado","descripcion","marca","vin","modelo","tipos.nombre","created_user")
-				->paginate(10);
+				->paginate(10); */
+				$equipotransporte=Activo::with(['sucursal'=>fn($suc)=>$suc->with('empresa:id_empresa,alias')])->search($querry)->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->whereIn('tipo_id',$tipos)->orderBy('id','ASC')->paginate(10);
 			}else{
-				$equipotransporte=EquipoTransporte::leftJoin('tipos', 'equipo_transporte.tipo', '=', 'tipos.id_tipo')->
+				/* $equipotransporte=EquipoTransporte::leftJoin('tipos', 'equipo_transporte.tipo', '=', 'tipos.id_tipo')->
 				where('created_user', '=', auth()->user()->id)
 				->Where(function ($query) use($querry){
 					$query->where('vin','LIKE','%'.$querry.'%')
@@ -49,31 +59,33 @@ class EquipoTransporteController extends Controller
 					->orWhere('num_equipo','LIKE','%'.$querry.'%')
 					->orWhere('tipos.nombre','LIKE','%'.$querry.'%');
 				})->select("id_equipo_transporte","num_equipo","equipo_transporte.estado","descripcion","marca","vin","modelo","tipos.nombre","created_user")
-				->paginate(10);
+				->paginate(10); */
 			}
     		return view('inventario.EquipoTransporte.index',["EquipoTransporte"=>$equipotransporte,"searchText"=>$querry]);
     	}
     }
     public function create()
     {
-    	$Departamento=Departamentos::where('estado','=','1')->orderBy('nombre')->get();
-    	$Puesto=Puestos::where('estado','=','1')->orderBy('nombre')->get();
-    	$Empleado=Empleado::where('estado','=','1')->orderBy('apellido_paterno')->get();
-        $tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
+		$sucursales=$this->sucUsers;
+    	$Departamento=Departamentos::where('status','=','1')->orderBy('nombre')->get();
+    	//$Puesto=Puestos::where('estado','=','1')->orderBy('nombre')->get();
+		$Puesto=Puesto::join('departamento_puesto as dp','puestos.id_puesto','=','dp.id_puesto')->select('puestos.*','dp.id_departamento')->get();
+    	$Empleado=Empleado::where('status','=','1')->orderBy('apellido_p')->get();
+        $tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->get();
 		$depreciacion=EstadosDepreciacion::where('estado','=','1')->get();
-    	return view("inventario.EquipoTransporte.create",["tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado, "Depreciacion"=>$depreciacion]);
+    	return view("inventario.EquipoTransporte.create",["tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado, "Depreciacion"=>$depreciacion,'sucursales'=>$sucursales]);
     }
     public function store(EquipoTransporteRequest $request)
     {	
-    	$EquipoTransporte= new EquipoTransporte;
+    	$EquipoTransporte= new Activo();
     	$EquipoTransporte->estado='1';
     	$EquipoTransporte->descripcion=$request->get('descripcion');
     	$EquipoTransporte->marca=$request->get('marca');
-    	$EquipoTransporte->vin=$request->get('vin');
+    	$EquipoTransporte->serie=$request->get('vin');
     	$EquipoTransporte->modelo=$request->get('modelo');
     	$EquipoTransporte->num_motor=$request->get('num_motor');
     	$EquipoTransporte->color=$request->get('color');
-    	$EquipoTransporte->tipo=$request->get('tipo');
+    	$EquipoTransporte->tipo_id=$request->get('tipo');
         $EquipoTransporte->costo=$request->get('costo');
     	$EquipoTransporte->nombre_provedor=$request->get('nombre_provedor');
 		$EquipoTransporte->id_proveedor=$request->get('id_proveedor');
@@ -84,80 +96,88 @@ class EquipoTransporteController extends Controller
 		$EquipoTransporte->fecha_depreciacion_inicio=$request->get('fecha_depreciacion_inicio');
     	$EquipoTransporte->tasa_depreciacion=$request->get('tasa_depreciacion');
     	$EquipoTransporte->vida_util=$request->get('vida_util');
-    	$EquipoTransporte->area_destinada=$request->get('area_destinada');
-    	$EquipoTransporte->puesto=$request->get('puesto');
-    	$EquipoTransporte->nombre_responsable=$request->get('nombre_responsable');
+    	$EquipoTransporte->departamento_id=$request->get('area_destinada');
+    	$EquipoTransporte->puesto_id=$request->get('puesto');
+    	$EquipoTransporte->responsable_id=$request->get('nombre_responsable');
        	$EquipoTransporte->observaciones=$request->get('observaciones');
     	$EquipoTransporte->garantia=$request->get('garantia');
         $EquipoTransporte->created_user=auth()->user()->id;
+		$EquipoTransporte->sucursal_id=$request->get('sucursal_origen');
     	$EquipoTransporte->save();
     	if($request->hasFile('xml')){
     		$file=$request->file('xml');
-    		$file->move(public_path().'/archivos/inventario/EquipoTransporte/xml/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
-    		$EquipoTransporte->xml=$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName();
+    		$file->storeAs('/archivos/inventario/EquipoTransporte/xml/',$EquipoTransporte->id."-".$file->getClientOriginalName(),'public');
+    		//$file->move(public_path().'/archivos/inventario/EquipoTransporte/xml/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
+    		$EquipoTransporte->xml=$EquipoTransporte->id."-".$file->getClientOriginalName();
     	}  	
     	if($request->hasFile('pdf')){
     		$file=$request->file('pdf');
-    		$file->move(public_path().'/archivos/inventario/EquipoTransporte/pdf/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
-    		$EquipoTransporte->pdf=$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName();
+			$file->storeAs('/archivos/inventario/EquipoTransporte/pdf/',$EquipoTransporte->id."-".$file->getClientOriginalName(),'public');
+    		//$file->move(public_path().'/archivos/inventario/EquipoTransporte/pdf/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
+    		$EquipoTransporte->pdf=$EquipoTransporte->id."-".$file->getClientOriginalName();
     	}
-    	$id=$EquipoTransporte->id_equipo_transporte;
+    	$id=$EquipoTransporte->id;
     	if($request->hasFile('foto')) {
             foreach($request->file('foto') as $image) {
                 $Imagen= new imagen;
-                $image->move(public_path().'/imagenes/inventario/EquipoTransporte/img/',$id."_".time()."_".$image->getClientOriginalName());
-                $Imagen->id_equipo=$id;
-                $Imagen->id_area='1';
+    		    $image->storeAs('/imagenes/inventario/EquipoTransporte/img/',$id."_".time()."_".$image->getClientOriginalName(),'public');
+                //$image->move(public_path().'/imagenes/inventario/EquipoTransporte/img/',$id."_".time()."_".$image->getClientOriginalName());
+                $Imagen->activo_id=$id;
+                //$Imagen->id_area='1';
                 $Imagen->imagen=$id."_".time()."_".$image->getClientOriginalName();
     	        $Imagen->estado='1';
                 $image->getClientOriginalName();
                 $Imagen->save();
             }
         }
-    	$EquipoTransporte->num_equipo='EQT-'.$EquipoTransporte->id_equipo_transporte;
+		$tipos=Tipo::where('id_giro',1)->where('sucursal_id',$request->get('sucursal_origen'))->get()->pluck('id_tipo');
+        $cont=Activo::where('sucursal_id',$request->get('sucursal_origen'))->whereIn('tipo_id',$tipos)->get()->count();
+    	$EquipoTransporte->num_equipo='EQT-'.($cont+1);
 		$EquipoTransporte->update();
     	return Redirect::to('admin/inventario/EquipoTransporte');
     }
     public function show($id)
     {
-        $Departamento=Departamentos::where('estado','=','1')->get();
+        $sucursales=Sucursales::where('status',1)->get();
+        $Departamento=Departamentos::where('status','=','1')->get();
         $Puesto=Puestos::get();
         $Empleado=Empleado::get();
-    	$EquipoTransporte=EquipoTransporte::findOrFail($id);
+    	$EquipoTransporte=Activo::findOrFail($id);
         $tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
-		$Imagen=Imagen::where('estado','=','1')->where('id_equipo','=',$id)->where('id_area', '=', 1)->get();
+		$Imagen=Imagen::where('estado','=','1')->where('activo_id','=',$id)->get();
 		$depreciacion=EstadosDepreciacion::where('estado','=','1')->get();
 		if(auth()->user()->role_id<3 || auth()->user()->id == $EquipoTransporte->created_user){
-			return view("inventario.EquipoTransporte.show",["EquipoTransporte"=>$EquipoTransporte,"tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado,"Imagen"=>$Imagen, "Depreciacion"=>$depreciacion]);
+			return view("inventario.EquipoTransporte.show",["EquipoTransporte"=>$EquipoTransporte,"tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado,"Imagen"=>$Imagen, "Depreciacion"=>$depreciacion,'sucursales'=>$sucursales]);
 		}else{
 			return redirect('admin/inventario/EquipoTransporte');
 		}
     }
     public function edit($id)
     {
-		$EquipoTransporte=EquipoTransporte::findOrFail($id);
-		$Departamento=Departamentos::where('estado','=','1')->get();
+		$sucursales=$this->sucUsers;
+		$EquipoTransporte=Activo::findOrFail($id);
+		$Departamento=Departamentos::where('status','=','1')->get();
 		$Puesto=Puestos::where('estado','=','1')->orderBy('nombre')->get();
-		$Empleado=Empleado::where('estado','=','1')->orderBy('apellido_paterno')->get();
+		$Empleado=Empleado::where('status','=','1')->orderBy('apellido_p')->get();
 		$tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
 		$depreciacion=EstadosDepreciacion::where('estado','=','1')->get();
-		$Imagen=Imagen::where('estado','=','1')->where('id_equipo','=',$id)->where('id_area', '=', 1)->get();
+		$Imagen=Imagen::where('estado','=','1')->where('activo_id','=',$id)->get();
 		if(auth()->user()->role_id<3 || auth()->user()->id == $EquipoTransporte->created_user){
-			return view("inventario.EquipoTransporte.edit",["EquipoTransporte"=>$EquipoTransporte,"tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado,"Imagen"=>$Imagen, "Depreciacion"=>$depreciacion]);  
+			return view("inventario.EquipoTransporte.edit",["EquipoTransporte"=>$EquipoTransporte,"tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado,"Imagen"=>$Imagen, "Depreciacion"=>$depreciacion,'sucursales'=>$sucursales]);  
 		}else{
 			return redirect('/admin/inventario/EquipoTransporte');
         }
     }
     public function update(EquipoTransporteRequest $request, $id)
     {
-    	$EquipoTransporte = EquipoTransporte::findOrFail($id);
+    	$EquipoTransporte = Activo::findOrFail($id);
     	$EquipoTransporte->descripcion=$request->get('descripcion');
     	$EquipoTransporte->marca=$request->get('marca');
-    	$EquipoTransporte->vin=$request->get('vin');
+    	$EquipoTransporte->serie=$request->get('vin');
     	$EquipoTransporte->modelo=$request->get('modelo');
     	$EquipoTransporte->num_motor=$request->get('num_motor');
     	$EquipoTransporte->color=$request->get('color');
-    	$EquipoTransporte->tipo=$request->get('tipo');
+    	$EquipoTransporte->tipo_id=$request->get('tipo');
         $EquipoTransporte->costo=$request->get('costo');
     	$EquipoTransporte->nombre_provedor=$request->get('nombre_provedor');
 		$EquipoTransporte->id_proveedor=$request->get('id_proveedor');
@@ -178,35 +198,40 @@ class EquipoTransporteController extends Controller
     	if($request->get('motivo_baja')!=""){
 			$EquipoTransporte->motivo_baja=$request->get('motivo_baja');
     	}
-    	$EquipoTransporte->area_destinada=$request->get('area_destinada');
-    	$EquipoTransporte->puesto=$request->get('puesto');
-    	$EquipoTransporte->nombre_responsable=$request->get('nombre_responsable');
+    	$EquipoTransporte->departamento_id=$request->get('area_destinada');
+    	$EquipoTransporte->puesto_id=$request->get('puesto');
+    	$EquipoTransporte->responsable_id=$request->get('nombre_responsable');
     	$EquipoTransporte->observaciones=$request->get('observaciones');
     	$EquipoTransporte->garantia=$request->get('garantia');
 		$EquipoTransporte->precio_venta=$request->get('precio_venta');
 		$EquipoTransporte->estatus_depreciacion=$request->get('estatus_depreciacion');
+		$EquipoTransporte->sucursal_id=$request->get('sucursal_origen');
     	if($request->hasFile('xml')){
     		$file=$request->file('xml');
-    		$file->move(public_path().'/archivos/inventario/EquipoTransporte/xml/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
-    		$EquipoTransporte->xml=$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName();
+    		//$file->move(public_path().'/archivos/inventario/EquipoTransporte/xml/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
+    		$file->storeAs('/archivos/inventario/EquipoTransporte/xml/',$EquipoTransporte->id."-".$file->getClientOriginalName(),'public');
+    		$EquipoTransporte->xml=$EquipoTransporte->id."-".$file->getClientOriginalName();
     	}
     	if($request->hasFile('pdf')){
     		$file=$request->file('pdf');
-    		$file->move(public_path().'/archivos/inventario/EquipoTransporte/pdf/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
-    		$EquipoTransporte->pdf=$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName();
+    		//$file->move(public_path().'/archivos/inventario/EquipoTransporte/pdf/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
+			$file->storeAs('/archivos/inventario/EquipoTransporte/pdf/',$EquipoTransporte->id."-".$file->getClientOriginalName(),'public');
+    		$EquipoTransporte->pdf=$EquipoTransporte->id."-".$file->getClientOriginalName();
     	}
     	if($request->hasFile('carta_responsiva')){
     		$file=$request->file('carta_responsiva');
-    		$file->move(public_path().'/archivos/inventario/EquipoTransporte/carta_responsiva/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
-    		$EquipoTransporte->carta_responsiva=$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName();
+    		//$file->move(public_path().'/archivos/inventario/EquipoTransporte/carta_responsiva/',$EquipoTransporte->id_equipo_transporte."-".$file->getClientOriginalName());
+			$file->storeAs('/archivos/inventario/EquipoTransporte/carta_responsiva/',$EquipoTransporte->id."-".$file->getClientOriginalName(),'public');
+    		$EquipoTransporte->carta_responsiva=$EquipoTransporte->id."-".$file->getClientOriginalName();
     	}
     	$EquipoTransporte->update();
 		if($request->hasFile('foto')) {
             foreach($request->file('foto') as $image) {
                 $Imagen= new imagen;
-                $image->move(public_path().'/imagenes/inventario/EquipoTransporte/img/',$id."_".time()."_".$image->getClientOriginalName());
-                $Imagen->id_equipo=$id;
-                $Imagen->id_area='1';
+    		    $image->storeAs('/imagenes/inventario/EquipoTransporte/img/',$id."_".time()."_".$image->getClientOriginalName(),'public');
+                //$image->move(public_path().'/imagenes/inventario/EquipoTransporte/img/',$id."_".time()."_".$image->getClientOriginalName());
+                $Imagen->activo_id=$id;
+                //$Imagen->id_area='1';
                 $Imagen->imagen=$id."_".time()."_".$image->getClientOriginalName();
     	        $Imagen->estado='1';
                 $image->getClientOriginalName();
@@ -217,7 +242,7 @@ class EquipoTransporteController extends Controller
     }
     public function destroy(Request $request, $id)
     {
-    	$EquipoTransporte = EquipoTransporte::findOrFail($id);
+    	$EquipoTransporte = Activo::findOrFail($id);
     	$EquipoTransporte->estado='0';
     	$now = new \DateTime();
 		$EquipoTransporte->fecha_baja= $now->format('y-m-d');
@@ -228,13 +253,13 @@ class EquipoTransporteController extends Controller
     public function activar(Request $request)
     {
         $id =$request->get('id_act');
-        $EquipoTransporte = EquipoTransporte::findOrFail($id);
+        $EquipoTransporte = Activo::findOrFail($id);
         $EquipoTransporte->estado='1';   
         $EquipoTransporte->update();
         return Redirect::to('admin/inventario/EquipoTransporte');
     }
     public function reporte(){
-    	$Departamento=Departamentos::where('estado','=','1')->get();
+    	$Departamento=Departamentos::where('status','=','1')->get();
         $Puesto=Puestos::get();
         $Empleado=Empleado::get();
         $tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
@@ -245,13 +270,13 @@ class EquipoTransporteController extends Controller
     }
     public function responsiva($id){
         // responsiva para unico equipo
-	    $EquipoTransporte = EquipoTransporte::findOrFail($id);
+	    $EquipoTransporte = Activo::findOrFail($id);
         $pdf = PDF::loadView('pdf.EquipoTransporte', compact('EquipoTransporte'));
         return $pdf->stream('carta_responsiva_'.$id.'.pdf');
     }
 	public function responsivas(){
         //devuelve vista para elegir a la persona
-        $Empleado=Empleado::where('estado','=','1')->orderBy('apellido_paterno')->get();
+        $Empleado=Empleado::where('status','=','1')->orderBy('apellido_p')->get();
     	return view("inventario.EquipoTransporte.responsivas",["Empleado"=>$Empleado]);
     }
 	public function imprimir_responsiva(Request $request){
@@ -274,8 +299,9 @@ class EquipoTransporteController extends Controller
                 $id=$obj->id_imagen;
                 $img = Imagen::find($id);
                 $img->delete();
-                $path=public_path().'/imagenes/inventario/EquipoTransporte/img/'.$obj->imagen;
-                unlink($path);
+				Storage::disk('public')->delete('/imagenes/inventario/EquipoTransporte/img/'.$obj->imagen);
+                //$path=public_path().'/imagenes/inventario/EquipoTransporte/img/'.$obj->imagen;
+                //unlink($path);
                 $result=true;
             }
        } 
