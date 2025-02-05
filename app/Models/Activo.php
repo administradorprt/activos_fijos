@@ -52,4 +52,8 @@ class Activo extends Model
     {
         return $this->belongsTo(Sucursales::class,'sucursal_id', 'id_sucursal');
     }
+    public function empleado():BelongsTo
+    {
+        return $this->belongsTo(Empleado::class,'responsable_id', 'id_empleado');
+    }
 }
