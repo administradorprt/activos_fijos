@@ -66,7 +66,7 @@ class HerramientasExport implements FromQuery, ShouldAutoSize, WithMapping,WithH
             Date::PHPToExcel($invoice->fecha_compra),//$invoice->fecha_compra,
             $invoice->tasa_depreciacion,
             $invoice->vida_util,
-            $invoice->empleado,
+            isset($invoice->empleado)?$invoice->empleado->nombres." ".$invoice->empleado->apellido_p:'Sin asignar',
             $invoice->area->nombre??'Sin área',
             $invoice->puestos->nombre??'Sin puesto',
             Date::PHPToExcel($invoice->fecha_baja),
