@@ -296,8 +296,9 @@ class HerramientasController extends Controller
                 $id=$obj->id_imagen;
                 $img = Imagen::find($id);
                 $img->delete();
-                $path=public_path().'/imagenes/inventario/Herramientas/img/'.$obj->imagen;
-                unlink($path);
+                Storage::disk('public')->delete('/imagenes/inventario/Herramientas/img/'.$obj->imagen);
+                //$path=public_path().'/imagenes/inventario/Herramientas/img/'.$obj->imagen;
+                //unlink($path);
                 $result=true;
             }
        } 
