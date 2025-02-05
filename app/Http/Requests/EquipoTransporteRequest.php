@@ -39,7 +39,8 @@ class EquipoTransporteRequest extends FormRequest
             'area_destinada'=>'required|numeric',
             'puesto'=>'required|numeric',
             'nombre_responsable'=>'required|numeric',
-            'precio_venta'=>'numeric|nullable'
+            'precio_venta'=>'numeric|nullable',
+            'sucursal_origen'=>'required'
          ];
     }
 }
