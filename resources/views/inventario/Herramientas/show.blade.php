@@ -67,7 +67,7 @@
 					<label for="tipo">Tipo</label>
 					<select name="tipo" class="form-control"  disabled="">
 						@foreach($tipos as $tip )
-							@if($tip->id_tipo== $Herramientas->tipo)
+							@if($tip->id_tipo== $Herramientas->tipo_id)
 							<option selected value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
 							@else
 								<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
