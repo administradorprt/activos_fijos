@@ -2,7 +2,10 @@
 
 namespace App\Exports;
 
+use App\Models\Activo;
 use App\Models\EquipoComputo;
+use App\Models\Tipo;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -19,6 +22,11 @@ class EquipoComputoExport implements FromQuery, ShouldAutoSize, WithMapping,With
     */
     use Exportable;
 
+    public $sucursales;
+    public function __construct() {
+        $this->sucursales=Auth::user()->empleado->sucursales;
+    }
+
     public function forState(int $state)
     {
         $this->state = $state;
@@ -27,15 +35,16 @@ class EquipoComputoExport implements FromQuery, ShouldAutoSize, WithMapping,With
     }
     public function query()
     {
+        $tipos=Tipo::where('id_giro',2)->whereIn('sucursal_id',$this->sucursales->pluck('id_sucursal'))->get()->pluck('id_tipo');
         switch ($this->state) {
             case '1':
-                return EquipoComputo::query();
+                return Activo::query()->whereIn('tipo_id',$tipos);
             break;
             case '2':
-                return EquipoComputo::query()->where("estado","=",0);
+                return Activo::query()->where("estado","=",0)->whereIn('tipo_id',$tipos);
             break;
             case '3':
-                return EquipoComputo::query()->where("estado","=",1);
+                return Activo::query()->where("estado","=",1)->whereIn('tipo_id',$tipos);
             break;
         }
     }   
@@ -57,9 +66,9 @@ class EquipoComputoExport implements FromQuery, ShouldAutoSize, WithMapping,With
             Date::PHPToExcel($invoice->fecha_compra),//$invoice->fecha_compra,
             $invoice->tasa_depreciacion,
             $invoice->vida_util,
-            $invoice->empleado->nombre." ".$invoice->empleado->apellido_paterno,
-            $invoice->area->nombre,
-            $invoice->puestos->nombre,
+            isset($invoice->empleado)?$invoice->empleado->nombres." ".$invoice->empleado->apellido_p:'Sin asignar',
+            $invoice->area->nombre??'Sin área',
+            $invoice->puestos->nombre??'Sin puesto',
             Date::PHPToExcel($invoice->fecha_baja),
             $invoice->motivo_baja,
             $invoice->observaciones,
