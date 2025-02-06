@@ -5,7 +5,7 @@
 
 <div>
 	<strong><label for="">Nombre del responsable:</strong>
-   {{$MobiliarioEquipo->empleado->nombre}} {{$MobiliarioEquipo->empleado->apellido_paterno}} {{$MobiliarioEquipo->empleado->apellido_materno}}</label>
+   {{$MobiliarioEquipo->empleado->nombres}} {{$MobiliarioEquipo->empleado->apellido_p}} {{$MobiliarioEquipo->empleado->apellido_m}}</label>
 </div>
 <div>
 	<strong> <label for="">Número del Equipo:</strong>
@@ -55,6 +55,6 @@ Si el usuario reincide, el Área correspondiente procederá a enviar un escrito 
 <br>
 <br>
 <div>Asociado Recibió</div>
-<div>{{$MobiliarioEquipo->empleado->nombre}} {{$MobiliarioEquipo->empleado->apellido_paterno}} {{$MobiliarioEquipo->empleado->apellido_materno}}</div>
+<div>{{$MobiliarioEquipo->empleado->nombre}} {{$MobiliarioEquipo->empleado->apellido_p}} {{$MobiliarioEquipo->empleado->apellido_m}}</div>
 <br>
 _____________________________

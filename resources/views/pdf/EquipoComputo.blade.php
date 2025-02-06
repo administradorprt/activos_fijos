@@ -5,7 +5,7 @@
 
 <div>
 	<strong><label for="">Nombre del responsable:</strong>
-   {{$EquipoComputo->empleado->nombre}} {{$EquipoComputo->empleado->apellido_paterno}} {{$EquipoComputo->empleado->apellido_materno}}</label>
+   {{$EquipoComputo->empleado->nombres}} {{$EquipoComputo->empleado->apellido_p}} {{$EquipoComputo->empleado->apellido_m}}</label>
 </div>
 <div>
 	<strong> <label for="">Número del Equipo:</strong>
@@ -56,6 +56,6 @@ Si el usuario reincide, el Área correspondiente procederá a enviar un escrito 
 <br>
 <br>
 <div>Asociado Recibió</div>
-<div>{{$EquipoComputo->empleado->nombre}} {{$EquipoComputo->empleado->apellido_paterno}} {{$EquipoComputo->empleado->apellido_materno}}</div>
+<div>{{$EquipoComputo->empleado->nombres}} {{$EquipoComputo->empleado->apellido_p}} {{$EquipoComputo->empleado->apellido_m}}</div>
 <br>
 _____________________________

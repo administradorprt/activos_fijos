@@ -11,11 +11,13 @@ table, th, td {
 @endphp
 <div>
 	<strong><label for="">Nombre del responsable:</strong>
-   {{$Empleado->nombre}} {{$Empleado->apellido_paterno}} {{$Empleado->apellido_materno}}</label>
+   {{$Empleado->nombres}} {{$Empleado->apellido_p}} {{$Empleado->apellido_m}}</label>
 </div>
 <div>
+	@foreach ($Empleado->puesto->departamento as $depto)    
 	<strong><label for="">Departamento:</strong>
-   {{$Empleado->puesto->departamento->nombre}}</label>
+   {{$depto->nombre}}</label>
+   @endforeach
 </div>
 <div>
 	<strong><label for="">Puesto:</strong>
@@ -67,7 +69,7 @@ Si el usuario reincide, el Área correspondiente procederá a enviar un escrito 
 <br>
 <div>Asociado Recibió</div>
 
- <div>{{$Empleado->nombre}} {{$Empleado->apellido_paterno}} {{$Empleado->apellido_materno}}</div>
+ <div>{{$Empleado->nombres}} {{$Empleado->apellido_p}} {{$Empleado->apellido_m}}</div>
 
 <br>
 _____________________________
