@@ -66,7 +66,7 @@ class HerramientasController extends Controller
         //$Puesto=Puestos::where('estado','=','1')->orderBy('nombre')->get();
         $Puesto=Puesto::join('departamento_puesto as dp','puestos.id_puesto','=','dp.id_puesto')->select('puestos.*','dp.id_departamento')->get();
         $Empleado=Empleado::where('status','=','1')->orderBy('apellido_p')->get();
-        $tipos=Tipo::where('estado','=','1')->where('id_giro','=','5')->get();
+        $tipos=Tipo::where('estado','=','1')->where('id_giro','=','5')->whereIn('sucursal_id',$sucursales->pluck('id_sucursal'))->get();
         $depreciacion=EstadosDepreciacion::where('estado','=','1')->get();
     	return view("inventario.Herramientas.create",["tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado, "Depreciacion"=>$depreciacion,"sucursales"=>$sucursales]);
     }
@@ -265,7 +265,7 @@ class HerramientasController extends Controller
         return (new HerramientasExport)->forState($id)->download('Herramientas.xlsx');
     }
     public function responsiva($id){
-        $Herramientas = Herramientas::findOrFail($id);
+        $Herramientas = Activo::findOrFail($id);
         $pdf = PDF::loadView('pdf.Herramientas', compact('Herramientas'));
         return $pdf->stream('carta_responsiva_'.$id.'.pdf');  
     }

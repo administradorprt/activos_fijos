@@ -138,16 +138,15 @@ class EquipoTransporteController extends Controller
     }
     public function show($id)
     {
-        $sucursales=Sucursales::where('status',1)->get();
         $Departamento=Departamentos::where('status','=','1')->get();
-        $Puesto=Puestos::get();
+        $Puesto=Puesto::get();
         $Empleado=Empleado::get();
     	$EquipoTransporte=Activo::findOrFail($id);
         $tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
 		$Imagen=Imagen::where('estado','=','1')->where('activo_id','=',$id)->get();
 		$depreciacion=EstadosDepreciacion::where('estado','=','1')->get();
 		if(auth()->user()->role_id<3 || auth()->user()->id == $EquipoTransporte->created_user){
-			return view("inventario.EquipoTransporte.show",["EquipoTransporte"=>$EquipoTransporte,"tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado,"Imagen"=>$Imagen, "Depreciacion"=>$depreciacion,'sucursales'=>$sucursales]);
+			return view("inventario.EquipoTransporte.show",["EquipoTransporte"=>$EquipoTransporte,"tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado,"Imagen"=>$Imagen, "Depreciacion"=>$depreciacion]);
 		}else{
 			return redirect('admin/inventario/EquipoTransporte');
 		}
@@ -157,7 +156,7 @@ class EquipoTransporteController extends Controller
 		$sucursales=$this->sucUsers;
 		$EquipoTransporte=Activo::findOrFail($id);
 		$Departamento=Departamentos::where('status','=','1')->get();
-		$Puesto=Puestos::where('estado','=','1')->orderBy('nombre')->get();
+		$Puesto=Puesto::where('status','=','1')->orderBy('nombre')->get();
 		$Empleado=Empleado::where('status','=','1')->orderBy('apellido_p')->get();
 		$tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
 		$depreciacion=EstadosDepreciacion::where('estado','=','1')->get();
@@ -260,7 +259,7 @@ class EquipoTransporteController extends Controller
     }
     public function reporte(){
     	$Departamento=Departamentos::where('status','=','1')->get();
-        $Puesto=Puestos::get();
+        $Puesto=Puesto::get();
         $Empleado=Empleado::get();
         $tipos=Tipo::where('estado','=','1')->where('id_giro','=','1')->get();
     	return view("inventario.EquipoTransporte.reporte",["tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado]);
@@ -282,8 +281,9 @@ class EquipoTransporteController extends Controller
 	public function imprimir_responsiva(Request $request){
         //responsiva para todos los equipos de una persona
 		$id =$request->get('nombre_responsable');
+		$tipos=Tipo::where('id_giro',1)->get()->pluck('id_tipo');
 		$Empleado=Empleado::findOrFail($id);
-		$EquipoTransporte = DB::select('select * from equipo_transporte where estado=1 and nombre_responsable='.$id);
+		$EquipoTransporte = Activo::where([['estado',1],['responsable_id',$id]])->whereIn('tipo_id',$tipos)->get();
 		$pdf = PDF::loadView('pdf.ResponsivaEquipoTransporte', ["EquipoTransporte"=>$EquipoTransporte,"Empleado"=>$Empleado]);
 		return $pdf->stream('carta_responsiva_.pdf');
 	}
