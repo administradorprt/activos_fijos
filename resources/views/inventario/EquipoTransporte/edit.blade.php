@@ -70,7 +70,7 @@
 					<label for="tipo">Tipo</label>
 					<select name="tipo" class="form-control" value="8">
 						@foreach($tipos as $tip )
-							@if($tip->id_tipo== $EquipoTransporte->tipo)
+							@if($tip->id_tipo== $EquipoTransporte->tipo_id)
 							<option selected value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
 							@else
 								<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
@@ -169,7 +169,7 @@
 					<label for="area_destinada">Área de destinada</label>
 					<select name="area_destinada" class="form-control" >
 						@foreach($Departamento as $dep )
-							@if($dep->id_departamento== $EquipoTransporte->area_destinada)
+							@if($dep->id_departamento== $EquipoTransporte->departamento_id)
 								<option selected value="{{$dep->id_departamento}}">{{$dep->nombre}} </option>
 							@else
 								<option value="{{$dep->id_departamento}}">{{$dep->nombre}} </option>
@@ -183,7 +183,7 @@
 					<label for="puesto">Puesto</label>
 					<select name="puesto" class="form-control" >
 						@foreach($Puesto as $pues )
-							@if($pues->id_puesto== $EquipoTransporte->puesto)
+							@if($pues->id_puesto== $EquipoTransporte->puesto_id)
 								<option selected value="{{$pues->id_puesto}}">{{$pues->nombre}} </option>
 							@else
 								<option value="{{$pues->id_puesto}}">{{$pues->nombre}} </option>

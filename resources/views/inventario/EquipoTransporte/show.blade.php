@@ -38,7 +38,7 @@
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
 					<label for="vin">Vin</label>
-					<input type="text" name="vin" class="form-control" placeholder="Vin" maxlength="17" required  value="{{$EquipoTransporte->vin}}" readonly="">
+					<input type="text" name="vin" class="form-control" placeholder="Vin" maxlength="17" required  value="{{$EquipoTransporte->serie}}" readonly="">
 				</div>
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -159,11 +159,7 @@
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
 					<label for="sucursal_origen">Sucursal origen</label>
-					@foreach($sucursales as $sucursal )
-						@if($sucursal->id_sucursal== $EquipoTransporte->sucursal_id)
-							<input type="text" name="sucursal_origen" class="form-control" placeholder="sucursal_origen" value="{{$sucursal->empresa->alias}} - {{$sucursal->nombre}}" readonly="">
-						@endif
-					@endforeach
+					<input type="text" name="sucursal_origen" class="form-control" placeholder="sucursal_origen" value="{{$EquipoTransporte->sucursal->empresa->alias}} - {{$EquipoTransporte->sucursal->nombre}}" readonly="">
 				</div>
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
