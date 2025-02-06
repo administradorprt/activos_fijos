@@ -423,6 +423,8 @@ class CargaController extends Controller
     public function importar_moe(Request $request)
     {
         try {
+            $request->validate(['sucursal'=>'required']);
+            $sucursal=$request->get('sucursal');
             $arr_conf= CargaController::config_default();
             $errors='';
             $null= null;
@@ -548,7 +550,7 @@ class CargaController extends Controller
                 $registros=0;
                 $hoy = date("Y-m-d");
                 foreach ($fila as $row) {
-                    $Equipo= new MobiliarioEquipo;
+                    $Equipo= new Activo();
                     $Equipo->estado=$row['estado'];
                     $Equipo->descripcion=$row['descripcion'];
                     $Equipo->marca=$row['marca'];
@@ -556,16 +558,16 @@ class CargaController extends Controller
                     $Equipo->modelo=$row['modelo'];
                     $Equipo->medida=$row['medida'];
                     $Equipo->color=$row['color'];
-                    $Equipo->tipo=$row['tipo'];
+                    $Equipo->tipo_id=$row['tipo'];
                     $Equipo->costo=$row['costo'];
                     $Equipo->nombre_provedor=$row['nombre_provedor'];
                     $Equipo->num_factura=$row['num_factura'];
                     $Equipo->fecha_compra=$row['fecha_compra'];
                     $Equipo->tasa_depreciacion=$row['tasa_depreciacion'];
                     $Equipo->vida_util=$row['vida_util'];
-                    $Equipo->area_destinada=$row['area_destinada'];
-                    $Equipo->puesto=$row['puesto'];
-                    $Equipo->nombre_responsable=$row['nombre_responsable'];
+                    $Equipo->departamento_id=$row['area_destinada'];
+                    $Equipo->puesto_id=$row['puesto'];
+                    $Equipo->responsable_id=$row['nombre_responsable'];
                     $Equipo->fecha_baja=$row['fecha_baja'];
                     $Equipo->motivo_baja=$row['motivo_baja'];
                     $Equipo->observaciones=$row['observaciones'];
@@ -578,9 +580,12 @@ class CargaController extends Controller
                     $Equipo->estatus_depreciacion=$row['estatus_depreciacion'];
                     $Equipo->masivo=$hoy;
                     $Equipo->created_user=auth()->user()->id;
+                    $Equipo->sucursal_id=$sucursal;
                     $Equipo->save();
-                    $id=$Equipo->id_equipo_mobiliario;
-                    $Equipo->num_equipo='MOE-'.$Equipo->id_equipo_mobiliario;
+                    $tipos=Tipo::where('id_giro',3)->where('sucursal_id',$sucursal)->get()->pluck('id_tipo');
+                    $cont=Activo::where('sucursal_id',$sucursal)->whereIn('tipo_id',$tipos)->get()->count();
+                    $id=$Equipo->id;
+                    $Equipo->num_equipo='MOE-'.($cont+1);
 		            $Equipo->update();
                     $registros++;
                 }
