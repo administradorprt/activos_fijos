@@ -16,7 +16,7 @@
 				  <label for="nombre_responsable">Nombre del Responsable</label>
 				  <select name="nombre_responsable" class="form-control" >
 					  @foreach($Empleado as $emp )								
-						  <option value="{{$emp->id_empleado}}"> {{$emp->apellido_paterno}} {{$emp->apellido_materno}} {{$emp->nombre}}</option>
+						  <option value="{{$emp->id_empleado}}"> {{$emp->apellido_p}} {{$emp->apellido_m}} {{$emp->nombres}}</option>
 					  @endforeach
 				  </select>
 			  </div>

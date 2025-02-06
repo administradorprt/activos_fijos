@@ -127,7 +127,7 @@
 					<label for="xml">Xml</label>
 					<!--<input type="file" name="xml" class="form-control" >-->
 					@if($EquipoComputo->xml!="")
-						<A HREF="{{asset('archivos/inventario/EquipoComputo/xml/'.$EquipoComputo->xml)}}" target="_blank"><input type="button" name="xml" class="form-control" value="ver xml"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoComputo/xml/'.$EquipoComputo->xml)}}" target="_blank"><input type="button" name="xml" class="form-control" value="ver xml"></A>
 					@else
 					<input type="text" name="xml" class="form-control" value="no hay xml" readonly="">
 					@endif
@@ -139,7 +139,7 @@
 					<!--<input type="file" name="pdf" class="form-control" >-->
 					@if($EquipoComputo->pdf!="")
 						
-						<A HREF="{{asset('archivos/inventario/EquipoComputo/pdf/'.$EquipoComputo->pdf)}}" target="_blank"><input type="button" name="pdf" class="form-control" value="ver PDF"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoComputo/pdf/'.$EquipoComputo->pdf)}}" target="_blank"><input type="button" name="pdf" class="form-control" value="ver PDF"></A>
 					@else
 					<input type="text" name="pdf" class="form-control" value="no hay pdf" readonly="">
 					@endif
@@ -159,10 +159,16 @@
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
+					<label for="sucursal_origen">Sucursal origen</label>
+					<input type="text" name="sucursal_origen" class="form-control" placeholder="sucursal_origen" value="{{$EquipoComputo->sucursal->empresa->alias}} - {{$EquipoComputo->sucursal->nombre}}" readonly="">
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
 					<label for="area_destinada">Área Destinada</label>
 					
 						@foreach($Departamento as $dep )
-							@if($dep->id_departamento== $EquipoComputo->area_destinada)
+							@if($dep->id_departamento== $EquipoComputo->departamento_id)
 							<input type="text" name="area_destinada" class="form-control" placeholder="area_destinada" value="{{$dep->nombre}}" readonly="">
 							@endif
 						@endforeach
@@ -174,7 +180,7 @@
 					<label for="puesto">Puesto</label>
 					
 					@foreach($Puesto as $pues )
-							@if($pues->id_puesto== $EquipoComputo->puesto)
+							@if($pues->id_puesto== $EquipoComputo->puesto_id)
 							<input type="text" name="puesto" class="form-control" placeholder="puesto" value="{{$pues->nombre}} " readonly="">
 							
 							@endif
@@ -186,8 +192,8 @@
 					<label for="nombre_responsable">Nombre del Responsable</label>
 					
 					@foreach($Empleado as $Emp )
-							@if($Emp->id_empleado== $EquipoComputo->nombre_responsable)
-							<input type="text" name="nombre_responsable" class="form-control" placeholder="nombre_responsable" value="{{$Emp->nombre}} {{$Emp->apellido_paterno}} {{$Emp->apellido_materno}}" readonly="">
+							@if($Emp->id_empleado== $EquipoComputo->responsable_id)
+							<input type="text" name="nombre_responsable" class="form-control" placeholder="nombre_responsable" value="{{$Emp->nombres}} {{$Emp->apellido_p}} {{$Emp->apellido_m}}" readonly="">
 							@endif
 						@endforeach
 				</div>
@@ -223,7 +229,7 @@
 					<!--<input type="file" name="carta_responsiva" class="form-control" >-->
 					@if($EquipoComputo->carta_responsiva!="")
 						
-						<A HREF="{{asset('archivos/inventario/EquipoComputo/carta_responsiva/'.$EquipoComputo->carta_responsiva)}}" target="_blank"><input type="button" name="carta_responsiva" class="form-control" value="ver carta responsiva"></A>
+						<A HREF="{{asset('storage/archivos/inventario/EquipoComputo/carta_responsiva/'.$EquipoComputo->carta_responsiva)}}" target="_blank"><input type="button" name="carta_responsiva" class="form-control" value="ver carta responsiva"></A>
 					@else
 					<input type="text" name="carta_responsiva" class="form-control" value="no hay carta responsiva" readonly="">
 					@endif
@@ -249,7 +255,7 @@
 								<div class="" style="margin-bottom: 1em; margin-right: 2em;">
 									<div class="img_galery">
 										<label class="checkeablee">
-											<img class="upd_img figure-img img-fluid rounded img-thumbnail"  onClick="reply_click()" height="100px" width="100px" src="{{asset('imagenes/inventario/EquipoComputo/img/'.$img->imagen)}}"/>
+											<img class="upd_img figure-img img-fluid rounded img-thumbnail"  onClick="reply_click()" height="100px" width="100px" src="{{asset('storage/imagenes/inventario/EquipoComputo/img/'.$img->imagen)}}"/>
 										</label>
 									</div>
 								</div>
@@ -265,7 +271,7 @@
 			</div>
 			<div class="form-group">
 				<!--<button class="btn btn-primary" type="submit" >Actualizar</button>-->
-				<a href="/admin/inventario/EquipoComputo/Responsiva/{{$EquipoComputo->id_equipo_computo}}" target="_blank"><button class="btn btn-success" type="button" >Imprimir Responsiva</button></a>
+				<a href="/admin/inventario/EquipoComputo/Responsiva/{{$EquipoComputo->id}}" target="_blank"><button class="btn btn-success" type="button" >Imprimir Responsiva</button></a>
 
 			</div>
 		</div>

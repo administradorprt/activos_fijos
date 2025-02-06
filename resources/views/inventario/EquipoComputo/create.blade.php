@@ -49,8 +49,16 @@
 					<div class="form-group">
 						<label for="tipo">Tipo</label>
 						<select name="tipo" class="form-control" >
-							@foreach($tipos as $tip )
-								<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
+							@foreach ($sucursales as $suc)
+								@if ($tipos->contains('sucursal_id',$suc->id_sucursal))
+									<optgroup label="{{$suc->empresa->alias}} {{$suc->nombre}}">
+										@foreach($tipos as $tip )
+											@if ($tip->sucursal_id == $suc->id_sucursal)
+												<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
+											@endif
+										@endforeach
+									</optgroup>
+								@endif
 							@endforeach
 						</select>
 					</div>
@@ -124,6 +132,17 @@
 				<div ng-app="myApp" ng-controller="namesCtrl">
 					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 						<div class="form-group">
+							<label for="sucursal_origen">Sucursal origen</label>
+							<select name="sucursal_origen" class="form-control"  required="">
+								<option value="" hidden>Seleccione una sucursal</option>
+								@foreach($sucursales as $sucursal )
+									<option  value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+								@endforeach
+							</select>
+						</div>
+					</div>
+					<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+						<div class="form-group">
 							<label for="area_destinada">Área Destinada</label>
 							<select name="area_destinada" class="form-control" ng-model="depa"  required="">
 								@foreach($Departamento as $dep )
@@ -152,7 +171,7 @@
 						angular.module('myApp', []).controller('namesCtrl', function($scope) {
 							$scope.Empleado = [
 							@foreach($Empleado as $emp )
-								{nombre:'{{$emp->nombre}} {{$emp->apellido_paterno}} {{$emp->apellido_materno}}',id_puesto:'{{$emp->id_puesto}}',id_empleado:'{{$emp->id_empleado}}'},
+								{nombre:'{{$emp->nombres}} {{$emp->apellido_p}} {{$emp->apellido_m}}',id_puesto:'{{$emp->id_puesto}}',id_empleado:'{{$emp->id_empleado}}'},
 							@endforeach
 							];
 							$scope.Departamento = [
@@ -175,11 +194,11 @@
 						<input type="text" name="garantia" class="form-control" placeholder="garantia" value="{{old('garantia')}}">
 					</div>
 				</div>
-				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-					<div class="form-group">
-						<button class="btn btn-primary" type="submit" >Guardar</button>
-							<a href="/admin/inventario/EquipoComputo"><button class="btn btn-danger" type="button" >Cancelar</button></a>
-					</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
+					<button class="btn btn-primary" type="submit" >Guardar</button>
+						<a href="/admin/inventario/EquipoComputo"><button class="btn btn-danger" type="button" >Cancelar</button></a>
 				</div>
 			</div>
 		</form>
