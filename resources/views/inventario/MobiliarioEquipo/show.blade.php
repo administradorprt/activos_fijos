@@ -3,7 +3,7 @@
 
 <div class="row">
 	<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-		<h3>Mobiliario y Equipo de Oficina: {{$MobiliarioEquipo->id_equipo_mobiliario}}</h3>
+		<h3>Mobiliario y Equipo de Oficina: {{$MobiliarioEquipo->id}}</h3>
 		@if(count($errors)>0)
 		<div class="alert alert-danger">
 			<ul>
@@ -15,7 +15,7 @@
 		</div>
 		@endif
 
-		<form action="{{route('MobiliarioEquipo.show',$MobiliarioEquipo->id_equipo_mobiliario)}}" method="get" enctype="multipart/form-data">
+		<form action="{{route('MobiliarioEquipo.show',$MobiliarioEquipo->id)}}" method="get" enctype="multipart/form-data">
 			@csrf
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
@@ -69,7 +69,7 @@
 						<label for="tipo">Tipo</label>
 						<select name="tipo" class="form-control"  disabled="">
 							@foreach($tipos as $tip )
-								@if($tip->id_tipo== $MobiliarioEquipo->tipo)
+								@if($tip->id_tipo== $MobiliarioEquipo->tipo_id)
 								<option selected value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
 								@else
 									<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
@@ -131,7 +131,7 @@
 					<div class="form-group">
 						<label for="xml">Xml</label>
 						@if($MobiliarioEquipo->xml!="")
-							<A HREF="{{asset('archivos/inventario/MobiliarioEquipo/xml/'.$MobiliarioEquipo->xml)}}" target="_blank"><input type="button" name="xml" class="form-control" value="ver xml"></A>
+							<A HREF="{{asset('storage/archivos/inventario/MobiliarioEquipo/xml/'.$MobiliarioEquipo->xml)}}" target="_blank"><input type="button" name="xml" class="form-control" value="ver xml"></A>
 						@else
 						<input type="text" name="xml" class="form-control" value="no hay xml" readonly="">
 						@endif
@@ -141,7 +141,7 @@
 					<div class="form-group">
 						<label for="pdf">Pdf</label>
 						@if($MobiliarioEquipo->pdf!="")
-							<A HREF="{{asset('archivos/inventario/MobiliarioEquipo/pdf/'.$MobiliarioEquipo->pdf)}}" target="_blank"><input type="button" name="pdf" class="form-control" value="ver PDF"></A>
+							<A HREF="{{asset('storage/archivos/inventario/MobiliarioEquipo/pdf/'.$MobiliarioEquipo->pdf)}}" target="_blank"><input type="button" name="pdf" class="form-control" value="ver PDF"></A>
 						@else
 						<input type="text" name="pdf" class="form-control" value="no hay pdf" readonly="">
 						@endif
@@ -161,10 +161,16 @@
 				</div>
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 					<div class="form-group">
+						<label for="sucursal_origen">Sucursal origen</label>
+						<input type="text" name="sucursal_origen" class="form-control" placeholder="sucursal_origen" value="{{$MobiliarioEquipo->sucursal->empresa->alias}} - {{$MobiliarioEquipo->sucursal->nombre}}" readonly="">
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+					<div class="form-group">
 						<label for="area_destinada">Área Destinada</label>
 						
 							@foreach($Departamento as $dep )
-								@if($dep->id_departamento== $MobiliarioEquipo->area_destinada)
+								@if($dep->id_departamento== $MobiliarioEquipo->departamento_id)
 								<input type="text" name="area_destinada" class="form-control" placeholder="area_destinada" value="{{$dep->nombre}}" readonly="">
 								@endif
 							@endforeach
@@ -176,7 +182,7 @@
 						<label for="puesto">Puesto</label>
 						
 						@foreach($Puesto as $pues )
-								@if($pues->id_puesto== $MobiliarioEquipo->puesto)
+								@if($pues->id_puesto== $MobiliarioEquipo->puesto_id)
 								<input type="text" name="puesto" class="form-control" placeholder="puesto" value="{{$pues->nombre}} " readonly="">
 								
 								@endif
@@ -188,8 +194,8 @@
 						<label for="nombre_responsable">Nombre del Responsable</label>
 						
 						@foreach($Empleado as $Emp )
-								@if($Emp->id_empleado== $MobiliarioEquipo->nombre_responsable)
-								<input type="text" name="nombre_responsable" class="form-control" placeholder="nombre_responsable" value="{{$Emp->nombre}} {{$Emp->apellido_paterno}} {{$Emp->apellido_materno}}" readonly="">
+								@if($Emp->id_empleado== $MobiliarioEquipo->responsable_id)
+								<input type="text" name="nombre_responsable" class="form-control" placeholder="nombre_responsable" value="{{$Emp->nombres}} {{$Emp->apellido_p}} {{$Emp->apellido_m}}" readonly="">
 								@endif
 							@endforeach
 					</div>
@@ -225,7 +231,7 @@
 						<!--<input type="file" name="carta_responsiva" class="form-control" >-->
 						@if($MobiliarioEquipo->carta_responsiva!="")
 							
-							<A HREF="{{asset('archivos/inventario/MobiliarioEquipo/carta_responsiva/'.$MobiliarioEquipo->carta_responsiva)}}" target="_blank"><input type="button" name="carta_responsiva" class="form-control" value="ver carta responsiva"></A>
+							<A HREF="{{asset('storage/archivos/inventario/MobiliarioEquipo/carta_responsiva/'.$MobiliarioEquipo->carta_responsiva)}}" target="_blank"><input type="button" name="carta_responsiva" class="form-control" value="ver carta responsiva"></A>
 						@else
 						<input type="text" name="carta_responsiva" class="form-control" value="no hay carta responsiva" readonly="">
 						@endif
@@ -251,7 +257,7 @@
 									<div class="" style="margin-bottom: 1em; margin-right: 2em;">
 										<div class="img_galery">
 											<label class="checkeablee">
-												<img class="upd_img figure-img img-fluid rounded img-thumbnail"  onClick="reply_click()" height="100px" width="100px" src="{{asset('imagenes/inventario/MobiliarioEquipo/img/'.$img->imagen)}}"/>
+												<img class="upd_img figure-img img-fluid rounded img-thumbnail"  onClick="reply_click()" height="100px" width="100px" src="{{asset('storage/imagenes/inventario/MobiliarioEquipo/img/'.$img->imagen)}}"/>
 											</label>
 										</div>
 									</div>
@@ -267,7 +273,7 @@
 				</div>
 				<div class="form-group">
 					<!--<button class="btn btn-primary" type="submit" >Actualizar</button>-->
-					<a href="/admin/inventario/MobiliarioEquipo/Responsiva/{{$MobiliarioEquipo->id_equipo_mobiliario}}" target="_blank"><button class="btn btn-success" type="button" >Imprimir Responsiva</button></a>
+					<a href="/admin/inventario/MobiliarioEquipo/Responsiva/{{$MobiliarioEquipo->id}}" target="_blank"><button class="btn btn-success" type="button" >Imprimir Responsiva</button></a>
 	
 				</div>
 			</div>

@@ -1,5 +1,5 @@
-<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-delete-{{$tras->id_equipo_mobiliario}}">
-	<form action="{{ route('MobiliarioEquipo.destroy',['MobiliarioEquipo' => $tras->id_equipo_mobiliario]) }}" method="post">
+<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-delete-{{$tras->id}}">
+	<form action="{{ route('MobiliarioEquipo.destroy',['MobiliarioEquipo' => $tras->id]) }}" method="post">
 		@method("DELETE")
 		@CSRF	
 		<div class="modal-dialog"  role="document">
@@ -9,7 +9,7 @@
 						<span aria-hidden="true">x</span>
 						
 					</button>
-					<h4 class="modal-title">Baja Mobiliario {{$tras->id_equipo_mobiliario}}</h4>
+					<h4 class="modal-title">Baja Mobiliario {{$tras->id}}</h4>
 				</div>
 				<div class="modal-body">
 					confirme si desea dar de baja el mobiliario
@@ -24,17 +24,17 @@
 		</div>
 	</form>
 </div>
-<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-activate-{{$tras->id_equipo_mobiliario}}">
-	<form action="{{ route('MobiliarioEquipo.activar',['MobiliarioEquipo' => $tras->id_equipo_mobiliario]) }}" method="post">
+<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-activate-{{$tras->id}}">
+	<form action="{{ route('MobiliarioEquipo.activar',['MobiliarioEquipo' => $tras->id]) }}" method="post">
 		@CSRF
 		<div class="modal-dialog"  role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">x</span>
-						<input name="id_act" type="text" value="{{$tras->id_equipo_mobiliario}}" hidden="" 	>
+						<input name="id_act" type="text" value="{{$tras->id}}" hidden="" 	>
 					</button>
-					<h4 class="modal-title">Activar Mobiliaro {{$tras->id_equipo_mobiliario}}</h4>
+					<h4 class="modal-title">Activar Mobiliaro {{$tras->id}}</h4>
 				</div>
 				<div class="modal-body">
 					confirme si desea activar el mobiliario

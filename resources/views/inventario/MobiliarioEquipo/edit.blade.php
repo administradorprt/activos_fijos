@@ -2,7 +2,7 @@
 @section('contenido')
 <div class="row">
 	<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-		<h3>Editar Mobiliario y Equipo de Oficina: {{$MobiliarioEquipo->id_equipo_mobiliario}}</h3>
+		<h3>Editar Mobiliario y Equipo de Oficina: {{$MobiliarioEquipo->id}}</h3>
 		@if(count($errors)>0)
 			<div class="alert alert-danger">
 				<ul>
@@ -12,7 +12,7 @@
 				</ul>
 			</div>
 		@endif
-		<form action="{{route('MobiliarioEquipo.update',$MobiliarioEquipo->id_equipo_mobiliario)}}" method="post" enctype="multipart/form-data">
+		<form action="{{route('MobiliarioEquipo.update',$MobiliarioEquipo->id)}}" method="post" enctype="multipart/form-data">
 			@method('PATCH')
 			@csrf
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
@@ -70,7 +70,7 @@
 					<label for="tipo">Tipo</label>
 					<select name="tipo" class="form-control" value="8">
 						@foreach($tipos as $tip )
-							@if($tip->id_tipo== $MobiliarioEquipo->tipo)
+							@if($tip->id_tipo== $MobiliarioEquipo->tipo_id)
 							<option selected value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
 							@else
 								<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
@@ -133,7 +133,7 @@
 					<label for="xml">Xml</label>
 					<input type="file" name="xml" class="form-control" accept="application/xml">
 					@if($MobiliarioEquipo->xml!="")
-						<A HREF="{{asset('archivos/inventario/MobiliarioEquipo/xml/'.$MobiliarioEquipo->xml)}}" target="_blank"><input type="button"  class="form-control" value="ver xml"></A>
+						<A HREF="{{asset('storage/archivos/inventario/MobiliarioEquipo/xml/'.$MobiliarioEquipo->xml)}}" target="_blank"><input type="button"  class="form-control" value="ver xml"></A>
 					@else
 					<input type="text"  class="form-control" value="no hay xml" readonly="">
 					@endif
@@ -144,7 +144,7 @@
 					<label for="pdf">Pdf</label>
 					<input type="file" name="pdf" class="form-control" accept="application/pdf">
 					@if($MobiliarioEquipo->pdf!="")
-						<A HREF="{{asset('archivos/inventario/MobiliarioEquipo/pdf/'.$MobiliarioEquipo->pdf)}}" target="_blank"><input type="button"  class="form-control" value="ver pdf"></A>
+						<A HREF="{{asset('storage/archivos/inventario/MobiliarioEquipo/pdf/'.$MobiliarioEquipo->pdf)}}" target="_blank"><input type="button"  class="form-control" value="ver pdf"></A>
 					@else
 					<input type="text" class="form-control" value="no hay pdf" readonly="">
 					@endif
@@ -152,10 +152,24 @@
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
+					<label for="sucursal_origen">Sucursal origen</label>
+					<select name="sucursal_origen" class="form-control" >
+						@foreach($sucursales as $sucursal )
+							@if($sucursal->id_sucursal== $MobiliarioEquipo->sucursal_id)
+								<option selected value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+							@else
+								<option value="{{$sucursal->id_sucursal}}">{{$sucursal->empresa->alias}} - {{$sucursal->nombre}} </option>
+							@endif
+						@endforeach
+					</select>
+				</div>
+			</div>
+			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="form-group">
 					<label for="area_destinada">Área Destinada</label>
 					<select name="area_destinada" class="form-control" >
 						@foreach($Departamento as $dep )
-							@if($dep->id_departamento== $MobiliarioEquipo->area_destinada)
+							@if($dep->id_departamento== $MobiliarioEquipo->departamento_id)
 								<option selected value="{{$dep->id_departamento}}">{{$dep->nombre}} </option>
 							@else
 								<option value="{{$dep->id_departamento}}">{{$dep->nombre}} </option>
@@ -169,7 +183,7 @@
 					<label for="puesto">Puesto</label>
 					<select name="puesto" class="form-control" >
 						@foreach($Puesto as $pues )
-							@if($pues->id_puesto== $MobiliarioEquipo->puesto)
+							@if($pues->id_puesto== $MobiliarioEquipo->puesto_id)
 								<option selected value="{{$pues->id_puesto}}">{{$pues->nombre}} </option>
 							@else
 								<option value="{{$pues->id_puesto}}">{{$pues->nombre}} </option>
@@ -183,10 +197,10 @@
 					<label for="nombre_responsable">Nombre del Responsable</label>
 					<select name="nombre_responsable" class="form-control" >
 						@foreach($Empleado as $emp )
-							@if($emp->id_empleado== $MobiliarioEquipo->nombre_responsable)
-								<option selected value="{{$emp->id_empleado}}"> {{$emp->apellido_paterno}} {{$emp->apellido_materno}} {{$emp->nombre}}</option>
+							@if($emp->id_empleado== $MobiliarioEquipo->responsable_id)
+								<option selected value="{{$emp->id_empleado}}"> {{$emp->apellido_p}} {{$emp->apellido_m}} {{$emp->nombres}}</option>
 							@else
-								<option value="{{$emp->id_empleado}}"> {{$emp->apellido_paterno}} {{$emp->apellido_materno}} {{$emp->nombre}}</option>
+								<option value="{{$emp->id_empleado}}"> {{$emp->apellido_p}} {{$emp->apellido_m}} {{$emp->nombres}}</option>
 							@endif
 						@endforeach
 						
@@ -199,7 +213,7 @@
 					<label for="carta_responsiva">Carta Responsiva</label>
 					<input type="file" name="carta_responsiva" class="form-control" >
 					@if($MobiliarioEquipo->carta_responsiva!="")
-						<A HREF="{{asset('archivos/inventario/MobiliarioEquipo/carta_responsiva/'.$MobiliarioEquipo->carta_responsiva)}}" target="_blank"><input type="button"  class="form-control" value="ver carta_responsiva"></A>
+						<A HREF="{{asset('storage/archivos/inventario/MobiliarioEquipo/carta_responsiva/'.$MobiliarioEquipo->carta_responsiva)}}" target="_blank"><input type="button"  class="form-control" value="ver carta_responsiva"></A>
 					@else
 					<input type="text" class="form-control" value="no hay carta_responsiva" readonly="">
 					@endif
@@ -282,7 +296,7 @@
 							<div class="" style="margin-bottom: 1em; margin-right: 2em;">
 								<div class="img_galery">
 									<label class="checkeablee">
-										<img class="upd_img figure-img img-fluid rounded img-thumbnail"  onClick="reply_click()" height="100px" width="100px" src="{{asset('imagenes/inventario/MobiliarioEquipo/img/'.$img->imagen)}}"/>
+										<img class="upd_img figure-img img-fluid rounded img-thumbnail"  onClick="reply_click()" height="100px" width="100px" src="{{asset('storage/imagenes/inventario/MobiliarioEquipo/img/'.$img->imagen)}}"/>
 									</label>
 									<input type="checkbox" class="chk_img_del_equip" value="{{$img->id_imagen}}" />
 									
