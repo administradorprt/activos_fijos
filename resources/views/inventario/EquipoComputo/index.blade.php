@@ -42,7 +42,7 @@
 							<td>{{$tras->marca}}</td>
 							<td>{{$tras->serie}}</td>
 							<td>{{$tras->modelo}}</td>
-							<td>{{$tras->nombre}}</td>
+							<td>{{$tras->tipos->nombre}}</td>
 							<td>
 								@php
 									$serversUser = \App\Models\Imagen::where('activo_id', '=', $tras->id)->take(1)->get();
