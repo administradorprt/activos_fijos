@@ -258,7 +258,7 @@ class MobiliarioEquipoController extends Controller
     public function reporte(){
     	$Departamento=Departamentos::where('status','=','1')->get();
         $Puesto=Puesto::get();
-    	$Empleado=Empleado::get();
+    	$Empleado=Empleado::where('status',1)->get();
         $tipos=Tipo::where('estado','=','1')->where('id_giro','=','3')->get();
     	return view("inventario.MobiliarioEquipo.reporte",["tipos"=>$tipos,"Departamento"=>$Departamento,"Puesto"=>$Puesto,"Empleado"=>$Empleado]);
     }
