@@ -1,5 +1,5 @@
-<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-delete-{{$tras->id_equipo_maquinaria}}">
-	<form action="{{ route('MaquinariaEquipo.destroy',['MaquinariaEquipo' => $tras->id_equipo_maquinaria]) }}" method="post">
+<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-delete-{{$tras->id}}">
+	<form action="{{ route('MaquinariaEquipo.destroy',['MaquinariaEquipo' => $tras->id]) }}" method="post">
 		@method("DELETE")
 		@CSRF
 		<div class="modal-dialog"  role="document">
@@ -9,7 +9,7 @@
 						<span aria-hidden="true">x</span>
 						
 					</button>
-					<h4 class="modal-title">Baja Maquinaria {{$tras->id_equipo_maquinaria}}</h4>
+					<h4 class="modal-title">Baja Maquinaria {{$tras->id}}</h4>
 				</div>
 				<div class="modal-body">
 					confirme si desea dar de baja la maquinaria o equipo
@@ -24,17 +24,17 @@
 		</div>
 	</form>
 </div>
-<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-activate-{{$tras->id_equipo_maquinaria}}">
-	<form action="{{ route('MaquinariaEquipo.activar',['MaquinariaEquipo' => $tras->id_equipo_maquinaria]) }}" method="post">
+<div class="modal fade model-side-in-right" role="dialog" tabindex="-1" aria-hidden="true" id="modal-activate-{{$tras->id}}">
+	<form action="{{ route('MaquinariaEquipo.activar',['MaquinariaEquipo' => $tras->id]) }}" method="post">
 		@CSRF
 		<div class="modal-dialog"  role="document">
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">x</span>
-						<input name="id_act" type="text" value="{{$tras->id_equipo_maquinaria}}" hidden="" 	>
+						<input name="id_act" type="text" value="{{$tras->id}}" hidden="" 	>
 					</button>
-					<h4 class="modal-title">Activar Maquinaria o Equipo {{$tras->id_equipo_maquinaria}}</h4>
+					<h4 class="modal-title">Activar Maquinaria o Equipo {{$tras->id}}</h4>
 				</div>
 				<div class="modal-body">
 					confirme si desea activar la Maquinaria o Equipo
