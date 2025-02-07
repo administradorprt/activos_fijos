@@ -44,7 +44,7 @@
 							<td>{{$tras->marca}}</td>
 							<td>{{$tras->codigo}}</td>
 							<td>{{$tras->modelo}}</td>
-							<td>{{$tras->nombre}}</td>
+							<td>{{$tras->tipos->nombre}}</td>
 							<td>
 								@php
 									$serversUser = \App\Models\Imagen::where('activo_id', '=', $tras->id)->get();
