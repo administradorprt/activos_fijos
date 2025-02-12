@@ -54,9 +54,17 @@
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 					<div class="form-group">
 						<label for="tipo">Tipo</label>
-						<select name="tipo" class="form-control">
-							@foreach($tipos as $tip )
-								<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
+						<select name="tipo" class="form-control" >
+							@foreach ($sucursales as $suc)
+								@if ($tipos->contains('sucursal_id',$suc->id_sucursal))
+									<optgroup label="{{$suc->empresa->alias}} {{$suc->nombre}}">
+										@foreach($tipos as $tip )
+											@if ($tip->sucursal_id == $suc->id_sucursal)
+												<option value="{{$tip->id_tipo}}">{{$tip->nombre}} </option>
+											@endif
+										@endforeach
+									</optgroup>
+								@endif
 							@endforeach
 						</select>
 					</div>
