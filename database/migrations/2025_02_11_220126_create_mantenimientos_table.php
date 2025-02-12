@@ -13,14 +13,16 @@ return new class extends Migration
     {
         Schema::create('mantenimientos', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('activo_id');
-            $table->string('proveedor',100);
+            $table->unsignedBigInteger('mante_activo_id');
+            $table->unsignedBigInteger('activo_id')->nullable();
+            $table->tinyInteger('tipo',unsigned:true);
+            $table->string('proveedor',100)->nullable();
+            $table->date('fecha');
             $table->string('comentarios',255)->nullable();
-            $table->string('pdf',255);
-            $table->string('xml',255);
             $table->softDeletes();
             $table->timestamps();
-
+            
+            $table->foreign('mante_activo_id')->references('id')->on('mante_activos')->onDelete('cascade')->onUpdate('cascade');
             $table->foreign('activo_id')->references('id')->on('activos')->onDelete('cascade')->onUpdate('cascade');
         });
     }
