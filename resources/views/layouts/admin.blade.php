@@ -15,6 +15,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <link rel="stylesheet" href="{{asset('css/alertify/alertify.css')}}">
     <link rel="stylesheet" href="{{asset('css/alertify/themes/default.min.css')}}"/>
+    @vite(['resources/js/app.js'])
   </head>
   <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
@@ -141,6 +142,20 @@
                   <li><a href="/admin/inventario/Herramientas/Reporte"><i class="fa fa-circle-o"></i> reportes</a></li>
                   <li><a href="/admin/inventario/Herramientas/Responsivas"><i class="fa fa-circle-o"></i> responsiva</a></li>
                   <li><a href="/admin/inventario/CargarArchivoMasivaHER"><i class="fa fa-files-o"></i> Carga Masiva</a></li>
+                  <li><a href="{{route('mante',5)}}"><i class="fa fa-circle-o"></i> Mantenimientos</a></li>
+                @endif
+              </ul>
+            </li>
+            <li class="treeview">
+              <a href="#">
+                <i class="fa fa-sliders"></i>
+                <span>Configuración</span>
+                <i class="fa fa-angle-left pull-right"></i>
+              </a>
+              <ul class="treeview-menu">
+                @if(auth()->user()->role_id < 3 || auth()->user()->role_her == 2)
+                  {{-- <li><a href="{{route('mante')}}"><i class="fa fa-circle-o"></i> Usuarios</a></li> --}}
+                  <li><a href="/admin/inventario/Herramientas/Responsivas"><i class="fa fa-circle-o"></i> Roles</a></li>
                 @endif
               </ul>
             </li>
