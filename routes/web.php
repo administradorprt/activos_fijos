@@ -4,9 +4,12 @@ use App\Http\Controllers\CargaController;
 use App\Http\Controllers\EquipoComputoController;
 use App\Http\Controllers\EquipoTransporteController;
 use App\Http\Controllers\HerramientasController;
+use App\Http\Controllers\ManteActivosController;
+use App\Http\Controllers\MantenimientosController;
 use App\Http\Controllers\MaquinariaEquipoController;
 use App\Http\Controllers\MobiliarioEquipoController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TipoController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -112,6 +115,24 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::post('EquipoHeramienta/importar_heramienta','importar_her')->name('ImportarHerramientas');
         });
 
+        Route::controller(ManteActivosController::class)->group(function(){
+            Route::get('Mantenimiento/Activos/{tipo}','index')->name('mante');
+            Route::get('Mantenimiento/Activos/{tipo}/create','create')->name('manteAct.create');
+            Route::post('Mantenimiento/Activos/store','store')->name('manteAct.store');
+        });
+        //mantenimientos
+        /* Route::controller(MantenimientosController::class)->group(function(){
+            Route::get('Mantenimientos/{tipo}','index')->name('mante');
+            Route::get('Mantenimiento/{tipo}/create','create')->name('mante.create');
+            Route::post('Mantenimientos/store','store')->name('mante.store');
+        }); */
+
+        //controlador de servicios de petiones
+        Route::controller(ServiceController::class)->group(function(){
+            Route::get('service/get/activos','getActivos')->name('service.getActivos');
+            Route::get('service/get/activos/{giro}','getActivosByType')->name('service.getActivosType');
+            Route::get('service/get/activos/{sucursal}/{giro}','getActivosBySucursal')->name('service.getActivosBySuc');
+        });
     });
 });
 
