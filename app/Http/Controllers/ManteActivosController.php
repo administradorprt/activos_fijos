@@ -49,4 +49,20 @@ class ManteActivosController extends Controller
         return back()->with('error', 'Error al guardar el mantenimiento: '.$e->getMessage());
       }
     }
+    public function show(ManteActivo $mante){
+      $mante->load('activo');
+      return view('inventario.MantenimientoActivos.show',compact('mante'));
+    }
+    public function destroy($id){
+      $mante=ManteActivo::findOrFail($id);
+      $mante->status=false;
+      $mante->save();
+      return to_route('mante',5);
+    }
+    public function activar($id){
+      $mante=ManteActivo::findOrFail($id);
+      $mante->status=true;
+      $mante->save();
+      return to_route('mante',5);
+    }
 }
