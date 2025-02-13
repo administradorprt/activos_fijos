@@ -119,13 +119,16 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('Mantenimiento/Activos/{tipo}','index')->name('mante');
             Route::get('Mantenimiento/Activos/{tipo}/create','create')->name('manteAct.create');
             Route::post('Mantenimiento/Activos/store','store')->name('manteAct.store');
+            Route::get('Mantenimiento/Activos/show/{mante}','show')->name('manteAct.show');
+            Route::delete('Mantenimiento/Activos/delete/{id}','destroy')->name('manteAct.delete');
+            Route::post('Mantenimiento/Activos/activar/{id}','activar')->name('manteAct.activar');
         });
         //mantenimientos
-        /* Route::controller(MantenimientosController::class)->group(function(){
-            Route::get('Mantenimientos/{tipo}','index')->name('mante');
-            Route::get('Mantenimiento/{tipo}/create','create')->name('mante.create');
-            Route::post('Mantenimientos/store','store')->name('mante.store');
-        }); */
+        Route::controller(MantenimientosController::class)->group(function(){
+            Route::get('Mantenimiento/{activo}/create','create')->name('mante.create');
+            Route::post('Mantenimientos/store/{activo}','store')->name('mante.store');
+            Route::patch('Mantenimiento/update_prox_mante/{activo}','updateProxMante')->name('mante.updateProx');
+        });
 
         //controlador de servicios de petiones
         Route::controller(ServiceController::class)->group(function(){
