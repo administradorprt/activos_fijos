@@ -15,6 +15,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
     <link rel="stylesheet" href="{{asset('css/alertify/alertify.css')}}">
     <link rel="stylesheet" href="{{asset('css/alertify/themes/default.min.css')}}"/>
+    <script src="{{asset('js/jquery-3.7.1.js')}}"></script>
     @vite(['resources/js/app.js'])
   </head>
   <body class="hold-transition skin-blue sidebar-mini">
@@ -299,7 +300,7 @@
         <strong>Grupo PRT &copy; 2023 <a href="#">Grupo PRT</a>.</strong> All rights reserved.
       </footer>
     <!-- jQuery 2.1.4 -->
-    <script src="{{asset('js/jQuery-2.1.4.min.js')}}"></script>
+    {{-- <script src="{{asset('js/jQuery-2.1.4.min.js')}}"></script> --}}
     <!-- Bootstrap 3.3.5 -->
     <script src="{{asset('js/bootstrap.min.js')}}"></script>
     <script src="{{asset('js/app.min.js')}}"></script>
