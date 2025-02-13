@@ -3,6 +3,15 @@
 <div class="row">
 	<div class="col-lg-10 col-md-10 col-sm-6 col-xs-12"x-data="mantenimiento">
 		<h3>Nuevo activo para mantenimiento</h3>
+		@if(count($errors)>0)
+		<div class="alert alert-danger">
+			<ul>
+				@foreach($errors ->all() as $error)
+				<li>{{$error}}</li>
+				@endforeach
+			</ul>
+		</div>
+		@endif
 		<form action="{{route('manteAct.store')}}" method="post" >
 			@csrf
 			<div class="row">
