@@ -8,6 +8,8 @@ use App\Models\Tipo;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ServiceController extends Controller
 {
@@ -37,6 +39,23 @@ class ServiceController extends Controller
       $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
       return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$mantelist)->get()->toJson();
     }catch(Exception $e){
+      return response()->json(['error' => $e->getMessage()], 400);
+    }
+  }
+  public function getQr(ManteActivo $id){
+    try {
+      if($id->activo->qr){
+        return response()->json(['path'=>asset('storage/'.$id->activo->qr)]);
+      }else{
+        //generamos y guardamos el QR
+        $qr=QrCode::size(250)->margin(2)->format('svg')->generate(route('manteAct.show',$id->id));
+        Storage::disk('public')->put('/mantenimientos/qrs/Qr_'.$id->id.'.svg',$qr);
+        //Actualizamos el valor del qr del activo
+        $id->activo->qr='/mantenimientos/qrs/Qr_'.$id->id.'.svg';
+        $id->activo->save();
+        return response()->json(['path'=>asset('storage/'.$id->activo->qr)]);
+      }
+    } catch (Exception $e) {
       return response()->json(['error' => $e->getMessage()], 400);
     }
   }
