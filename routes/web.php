@@ -135,6 +135,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('service/get/activos','getActivos')->name('service.getActivos');
             Route::get('service/get/activos/{giro}','getActivosByType')->name('service.getActivosType');
             Route::get('service/get/activos/{sucursal}/{giro}','getActivosBySucursal')->name('service.getActivosBySuc');
+            Route::get('service/mantenimiento/activos/{id}/qr','getQr')->name('service.manteAct.qr');
         });
     });
 });
