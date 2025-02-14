@@ -50,7 +50,7 @@ class ManteActivosController extends Controller
       }
     }
     public function show(ManteActivo $mante){
-      $mante->load('activo');
+      $mante->load('activo','lastMante');
       return view('inventario.MantenimientoActivos.show',compact('mante'));
     }
     public function destroy($id){
