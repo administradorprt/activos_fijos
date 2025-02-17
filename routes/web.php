@@ -128,6 +128,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('Mantenimiento/{activo}/create','create')->name('mante.create');
             Route::post('Mantenimientos/store/{activo}','store')->name('mante.store');
             Route::patch('Mantenimiento/update_prox_mante/{activo}','updateProxMante')->name('mante.updateProx');
+            Route::get('Mantenimiento/{activo}/historico','historico')->name('mante.history');
         });
 
         //controlador de servicios de petiones
@@ -138,6 +139,11 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('service/mantenimiento/activos/{id}/qr','getQr')->name('service.manteAct.qr');
         });
     });
+});
+
+//rutas de servicios públicos
+Route::controller(ServiceController::class)->group(function(){
+    Route::get('/service/mantenimiento/{id}','getManto')->name('service.manto');
 });
 
 require __DIR__.'/auth.php';
