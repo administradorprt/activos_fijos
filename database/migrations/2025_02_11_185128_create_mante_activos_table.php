@@ -15,6 +15,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('activo_id');
             $table->unsignedBigInteger('frecuencia_id');
+            $table->foreignId('user_created')->index();
+            $table->foreignId('user_updated')->index();
+            $table->string('ubicacion');
             $table->date('ultimo_mante')->nullable();
             $table->date('proximo_mante');
             $table->boolean('status')->default(true);
