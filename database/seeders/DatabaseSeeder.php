@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             GiroSeeder::class,
             EstadosDepreciacionSeeder::class,
             ConfigTableSeeder::class,
+            FrecuenciasSeeder::class,
         ]);   
     }
 }
