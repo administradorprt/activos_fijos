@@ -32,9 +32,15 @@
 						<select name="activo" class="form-control"  required="">
 							<option value="" hidden>Seleccione un activo</option>
 							<template x-for="activo in activos" :key="activo.id">
-								<option :value="activo.id" x-text="activo.descripcion"></option>
+								<option :value="activo.id" x-text="`${activo.descripcion} - ${activo.num_equipo}`"></option>
 							</template>
 						</select>
+					</div>
+				</div>
+				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+					<div class="form-group">
+						<label for="ubicacion">Ubicación</label>
+						<input type="text" name="ubicacion" class="form-control" placeholder="ubicación del activo" required value="{{old('ubicacion')}}">
 					</div>
 				</div>
 				<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
