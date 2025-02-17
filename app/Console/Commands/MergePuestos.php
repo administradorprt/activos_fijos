@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\JoinPuesto;
+use App\Models\Puesto;
 use App\Models\Puestos;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -30,7 +31,7 @@ class MergePuestos extends Command
     public function handle()
     {
         try {
-            $psConcentradora=Puestos::all();
+            $psConcentradora=Puesto::all();
             $psRrsguardo=DB::connection('resguardo')->table('puesto')->get();
             foreach($psConcentradora as $psC){
                 foreach($psRrsguardo as $psR){
