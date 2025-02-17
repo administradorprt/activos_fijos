@@ -29,7 +29,7 @@
 </div>
 <hr>
 @if ($mante->lastMante)
-    <h4>Último mantenimiento ({{$mante->ultimo_mante}} )</h4>
+    <h4>Último mantenimiento ({{$mante->ultimo_mante}} ) <a href="{{route('mante.history',$mante->id)}}"><button class="btn btn-primary" type="button" >Consultar historico</button></a></h4>
     <div class="row">
         <x-row-element>
             <label for="proveedor">Proveedor</label>
@@ -90,16 +90,6 @@
                                             </a>
                                         </div>
                                     </div>
-                                    {{-- <div class="form-group">
-                                        <div class="" style="margin-bottom: 1em; margin-right: 2em;">
-                                            <div class="img_galery">
-                                                <a href="{{asset('storage/'.$pdf->path)}}" target="_blank" class="rounded">
-                                                    <img class="upd_img figure-img img-fluid rounded img-thumbnail" height="100px" width="100px" src="{{asset('img/pdf.svg')}}"/>
-                                                    <span>{{$pdf->name}}</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div> --}}
                                 </div>
                                 @endforeach
                             </div>
@@ -119,10 +109,7 @@
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('qr', () => ({
-            pathQR: 'hola',loading:true,
-            log(){
-                console.log(this.$refs.qr);
-            },
+            pathQR: '',loading:true,
 			async getQr(){
                 this.loading=true;
 				const response=await fetch(@js(route('service.manteAct.qr',$mante->id)))
