@@ -13,7 +13,10 @@
                 <div class="thumbnail">
                     <img :src="pathQR.path" alt="Qr_activo_{{$mante->activo->id}}" x-cloak x-show="!loading">
                     <div class="caption">
-                        <a class="btn btn-success" :href="pathQR.path" download="" x-cloak x-show="!loading">Descargar QR</a>
+                        <a class="btn btn-success" :href="pathQR.path" download="" x-cloak x-show="!loading">
+                            <x-icons.download/>
+                            <span>Descargar QR</span>
+                        </a>
                     </div>
                 </div>
                 

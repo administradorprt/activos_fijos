@@ -18,11 +18,10 @@
 	<table id="table_mante" class="display">
 		<thead>
 			<tr>
-				<th>ID</th>
-				<th>Num. de equipo</th>
 				<th>Sucursal</th>
-				<th>Estado</th>
+				<th>Num. de equipo</th>
 				<th>Descripción</th>
+				<th>Ubicación</th>
 				<th>Frec. mantenimiento</th>
 				<th>Último mantenimiento</th>
 				<th>Próximo mantenimiento</th>
@@ -32,17 +31,10 @@
 		<tbody>
 			@foreach ($manteList as $mante)
 				<tr>
-					<td>{{$mante->id}}</td>
-					<td>{{$mante->activo->num_equipo}}</td>
 					<td>{{$mante->activo->sucursal->empresa->alias}} - {{$mante->activo->sucursal->nombre}}</td>
-					<td>
-						@if ($mante->status==1)
-							<span>Activo</span>
-						@else
-							<span>Inactivo</span>
-						@endif
-					</td>
-					<td>{{$mante->activo->descripcion}}</td>
+					<td>{{$mante->activo->num_equipo}}</td>
+					<td>{{str($mante->activo->descripcion)->words(4,'...')}}</td>
+					<td>{{str($mante->ubicacion)->words(3),'...'}}</td>
 					<td>{{$mante->frecuencia->name}}</td>
 					<td>{{$mante->ultimo_mante}}</td>
 					<td>{{$mante->proximo_mante}}</td>
@@ -64,7 +56,6 @@
 		</tbody>
 		<tfoot>
 			<tr>
-				<th></th>
 				<th></th>
 				<th></th>
 				<th></th>
@@ -97,7 +88,7 @@
 		stateSave:true,
 		//filtro por columna
 		initComplete: function () {	
-			this.api().columns([2,5]).every(function () {
+			this.api().columns([0,4]).every(function () {
 				let column = this;
 				
 				// Create select element
