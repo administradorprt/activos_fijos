@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Activo;
 use App\Models\ManteActivo;
+use App\Models\Mantenimiento;
 use App\Models\Tipo;
 use Exception;
 use Illuminate\Http\Request;
@@ -37,7 +38,7 @@ class ServiceController extends Controller
     try{
       $mantelist=ManteActivo::all()->pluck('activo_id');
       $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
-      return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$mantelist)->get()->toJson();
+      return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$mantelist)->orderBy('descripcion','ASC')->orderBy('num_equipo','ASC')->get()->toJson();
     }catch(Exception $e){
       return response()->json(['error' => $e->getMessage()], 400);
     }
@@ -55,6 +56,17 @@ class ServiceController extends Controller
         $id->activo->save();
         return response()->json(['path'=>asset('storage/'.$id->activo->qr)]);
       }
+    } catch (Exception $e) {
+      return response()->json(['error' => $e->getMessage()], 400);
+    }
+  }
+  /**
+   * Funcion para obtener toda la información de un mantenimiento
+   * @return json respuesta con la información obtenida 
+   */
+  public function getManto(Mantenimiento $id){
+    try {
+      return response()->json($id->load('imagenes','pdfs'));
     } catch (Exception $e) {
       return response()->json(['error' => $e->getMessage()], 400);
     }
