@@ -13,15 +13,16 @@ use Illuminate\Support\Facades\Auth;
 
 class ManteActivosController extends Controller
 {
-    private $sucUsers;
+    private $sucUsers,$user;
     public function __construct()
     {
 		$this->sucUsers=Auth::user()->empleado->sucursales;
+      $this->user=Auth::user();
     }
     public function index($tipo){
         $tipos=Tipo::where('id_giro',$tipo)->whereIn('sucursal_id',$this->sucUsers->pluck('id_sucursal'))->get()->pluck('id_tipo');
         $activos=Activo::with(['sucursal'=>fn($suc)=>$suc->with('empresa:id_empresa,alias')])->whereIn('sucursal_id',$this->sucUsers->pluck('id_sucursal'))->whereIn('tipo_id',$tipos)->get();
-        $manteList=ManteActivo::whereIn('activo_id',$activos->pluck('id'))->get();
+        $manteList=ManteActivo::where('status',1)->whereIn('activo_id',$activos->pluck('id'))->get();
         return view('inventario.MantenimientoActivos.index',compact('manteList','tipo'));
     }
     public function create($tipo){
@@ -34,6 +35,7 @@ class ManteActivosController extends Controller
         'sucursal_origen' =>'required',
         'activo' =>'required',
         'periodo' =>'required',
+        'ubicacion' =>'required',
       ]);
       try {
         $fecha=Carbon::now()->toDateString();
@@ -42,11 +44,15 @@ class ManteActivosController extends Controller
         $mante->frecuencia_id=$request->periodo;
         $mante->ultimo_mante=$fecha;
         $mante->proximo_mante=$fecha;
+        $mante->user_created=$this->user->id;
+        $mante->user_updated=$this->user->id;
+        $mante->ubicacion=$request->ubicacion;
         $mante->status=true;
         $mante->save();
-        return to_route('mante',5);
+        $activo=Activo::find($request->activo);
+        return to_route('mante',$activo->tipos->id_giro);
       } catch (Exception $e) {
-        return back()->with('error', 'Error al guardar el mantenimiento: '.$e->getMessage());
+        return back()->withInput()->withErrors(['error'=> 'Error al guardar el registro: '.$e->getMessage()]);
       }
     }
     public function show(ManteActivo $mante){
@@ -63,6 +69,8 @@ class ManteActivosController extends Controller
       $mante=ManteActivo::findOrFail($id);
       $mante->status=true;
       $mante->save();
+      $mante->activo->estado=true;
+      $mante->activo->update();
       return to_route('mante',5);
     }
 }
