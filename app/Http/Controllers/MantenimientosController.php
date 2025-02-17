@@ -79,4 +79,11 @@ class MantenimientosController extends Controller
       $activo->update();
       return to_route('mante',$activo->activo->tipos->id_giro);
     }
+    public function historico(ManteActivo $activo) {
+      $activo->load([
+        'lastMante'=>fn($last)=>$last->with('imagenes','pdfs'),
+        'mantenimientos'=>fn($mantos)=>$mantos->select('id','mante_activo_id','fecha')->orderBy('id','DESC')
+      ]);
+      return view('inventario.Mantenimientos.historial',compact('activo'));
+    }
 }
