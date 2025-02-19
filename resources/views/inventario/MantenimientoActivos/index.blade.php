@@ -40,7 +40,49 @@
 					<td>{{$mante->proximo_mante}}</td>
 					<td>
 						<a href="{{route('manteAct.show',$mante->id)}}"><button class="btn btn-info">Ver</button></a>
+						<div class="dropdown">
+							<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+								<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+								<span class="caret"></span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+								<li>
+									<a href="{{route('mante.create',$mante->id)}}">
+										<i class="fa fa-plus-circle" aria-hidden="true"></i>Mantenimiento
+									</a>
+								</li>
+								<li>
+									@if ($mante->lastMante)	
+										@if ($mante->user_created == Auth::user()->id)
+											<a href="{{route('mante.edit',$mante->lastMante->id)}}">
+												<i class="fa fa-pencil" aria-hidden="true"></i>Editar
+											</a>
+										@endif
+									@endif
+								</li>
+								<li>
+									@if($mante->status==1)
+										<a href="" data-target="#modal-delete-{{$mante->id}}" data-toggle="modal">
+											<i class="fa fa-trash" aria-hidden="true"></i>Baja
+										</a>
+									@else
+										<a href="" data-target="#modal-activate-{{$mante->id}}" data-toggle="modal">Activar</a>
+									@endif
+								</li>
+								@if ($mante->frecuencia->manual)
+									<li>
+										<a href="" data-target="#modal-fecha-{{$mante->id}}" data-toggle="modal">Definir manto.</a>
+									</li>
+								@endif
+							</ul>
+						</div>
+						{{-- <a href="{{route('manteAct.show',$mante->id)}}"><button class="btn btn-info">Ver</button></a>
 						<a href="{{route('mante.create',$mante->id)}}"><button class="btn btn-info">Manto.</button></a>
+						@if ($mante->lastMante)	
+							@if ($mante->user_created == Auth::user()->id)
+								<a href="{{route('mante.edit',$mante->lastMante->id)}}"><button class="btn btn-info">Editar</button></a>
+							@endif
+						@endif
 						@if ($mante->frecuencia->manual)
 							<a href="" data-target="#modal-fecha-{{$mante->id}}" data-toggle="modal"><button class="btn btn-primary">Definir manto.</button></a>
 						@endif
@@ -48,7 +90,7 @@
 							<a href="" data-target="#modal-delete-{{$mante->id}}" data-toggle="modal"><button class="btn btn-danger">Baja</button></a>
 						@else
 							<a href="" data-target="#modal-activate-{{$mante->id}}" data-toggle="modal"><button class="btn btn-success">Activar</button></a>
-						@endif
+						@endif --}}
 					</td>
 				</tr>
 				@include('inventario.MantenimientoActivos.modals')
