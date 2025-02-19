@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -26,5 +27,9 @@ class Mantenimiento extends Model
             'image/jpeg', 'image/png', 'image/gif', 'image/webp', 
             'image/svg+xml', 'image/avif', 'image/heic', 'image/heif'
         ]);
+    }
+    public function manteActivos():BelongsTo
+    {
+        return $this->belongsTo(ManteActivo::class,'mante_activo_id');
     }
 }
