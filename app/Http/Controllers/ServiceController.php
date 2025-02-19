@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Activo;
 use App\Models\ManteActivo;
 use App\Models\Mantenimiento;
+use App\Models\MantenimientoArchivo;
 use App\Models\Tipo;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ServiceController extends Controller
@@ -49,7 +51,7 @@ class ServiceController extends Controller
         return response()->json(['path'=>asset('storage/'.$id->activo->qr)]);
       }else{
         //generamos y guardamos el QR
-        $qr=QrCode::size(250)->margin(2)->format('svg')->generate(route('manteAct.show',$id->id));
+        $qr=QrCode::size(250)->margin(2)->format('svg')->generate(URL::signedRoute('manteAct.show.public',$id->id));
         Storage::disk('public')->put('/mantenimientos/qrs/Qr_'.$id->id.'.svg',$qr);
         //Actualizamos el valor del qr del activo
         $id->activo->qr='/mantenimientos/qrs/Qr_'.$id->id.'.svg';
@@ -69,6 +71,15 @@ class ServiceController extends Controller
       return response()->json($id->load('imagenes','pdfs'));
     } catch (Exception $e) {
       return response()->json(['error' => $e->getMessage()], 400);
+    }
+  }
+  public function delArchivosMante(Request $request,Mantenimiento $mante){
+    try {
+      MantenimientoArchivo::whereIn('id',$request->items)->delete();
+      return response()->json(['selected'=>$request->items,'imgs'=>$mante->imagenes,'pdfs'=>$mante->pdfs]);
+    } catch (Exception $e) {
+      return response()->json(['error' => $e->getMessage()], 400);
+
     }
   }
 }

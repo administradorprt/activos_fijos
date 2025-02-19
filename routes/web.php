@@ -128,7 +128,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('Mantenimiento/{activo}/create','create')->name('mante.create');
             Route::post('Mantenimientos/store/{activo}','store')->name('mante.store');
             Route::patch('Mantenimiento/update_prox_mante/{activo}','updateProxMante')->name('mante.updateProx');
-            Route::get('Mantenimiento/{activo}/historico','historico')->name('mante.history');
+            
+            Route::get('Mantenimiento/edit/{mante}','edit')->name('mante.edit');
+            Route::patch('Mantenimiento/update/{mante}','update')->name('mante.update');
         });
 
         //controlador de servicios de petiones
@@ -137,6 +139,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('service/get/activos/{giro}','getActivosByType')->name('service.getActivosType');
             Route::get('service/get/activos/{sucursal}/{giro}','getActivosBySucursal')->name('service.getActivosBySuc');
             Route::get('service/mantenimiento/activos/{id}/qr','getQr')->name('service.manteAct.qr');
+            Route::delete('service/mantenimiento/archivos/delete/{mante}','delArchivosMante')->name('service.mante.delArchivos');
         });
     });
 });
@@ -146,4 +149,10 @@ Route::controller(ServiceController::class)->group(function(){
     Route::get('/service/mantenimiento/{id}','getManto')->name('service.manto');
 });
 
+Route::controller(ManteActivosController::class)->group(function(){
+    Route::get('/mantenimiento/show/{mante}/public','publicShow')->name('manteAct.show.public');
+});
+Route::controller(MantenimientosController::class)->group(function(){
+    Route::get('Mantenimiento/{activo}/historico','historico')->name('mante.history');
+});
 require __DIR__.'/auth.php';
