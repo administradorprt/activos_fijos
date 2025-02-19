@@ -243,6 +243,10 @@ class HerramientasController extends Controller
 		$Herramientas->fecha_baja= $now->format('y-m-d');
 		$Herramientas->motivo_baja=$request->input('motivo_baja');
     	$Herramientas->update();
+        if($Herramientas->manteActivo){
+            $Herramientas->manteActivo->status=0;
+            $Herramientas->manteActivo->update();
+        }
     	return Redirect::to('admin/inventario/Herramientas');
     }
     public function activar(Request $request)
