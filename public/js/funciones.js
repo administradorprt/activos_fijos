@@ -20,7 +20,10 @@
 			modal.style.display = "none";
 		}
 	} 
-	
+	//function para cerrar el modal en los nuevos modulos
+	const closeModal=()=>{
+		modal.style.display = "none";
+	};
 	
 //borrar imagenes Herramientas
 $('.btn_delete_img').click(function(){
