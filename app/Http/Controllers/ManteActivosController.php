@@ -73,4 +73,12 @@ class ManteActivosController extends Controller
       $mante->activo->update();
       return to_route('mante',5);
     }
+    public function publicShow(Request $request,ManteActivo $mante){
+      //validamos que la ruta esté firmada
+      if(! $request->hasValidSignature()){
+        abort(401);
+      }
+      $mante->load('activo','lastMante');
+      return view('inventario.MantenimientoActivos.show',compact('mante'));
+    }
 }
