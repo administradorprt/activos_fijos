@@ -79,11 +79,76 @@ class MantenimientosController extends Controller
       $activo->update();
       return to_route('mante',$activo->activo->tipos->id_giro);
     }
-    public function historico(ManteActivo $activo) {
+    public function historico(Request $request,ManteActivo $activo) {
+      //validamos que la ruta esté firmada
+      if(!$request->hasValidSignature()){
+        abort(401);
+      }
       $activo->load([
         'lastMante'=>fn($last)=>$last->with('imagenes','pdfs'),
-        'mantenimientos'=>fn($mantos)=>$mantos->select('id','mante_activo_id','fecha')->orderBy('id','DESC')
+        'mantenimientos'=>fn($mantos)=>$mantos->select('id','mante_activo_id','fecha')->orderBy('fecha','DESC')
       ]);
       return view('inventario.Mantenimientos.historial',compact('activo'));
+    }
+    public function edit(Mantenimiento $mante){
+      return view('inventario.Mantenimientos.edit',compact('mante'));
+    }
+    public function update(Request $request, Mantenimiento $mante){
+      $request->validate([
+        'tipo' =>'required',
+        'proveedor' =>'required',
+        'fecha' =>'required|date',
+      ]);
+      if($mante->imagenes->count()<=0){
+        $request->validate([
+          'foto' =>'required',
+          'foto.*' =>'required|mimes:jpg,bmp,png,jpegd',
+        ]);
+      }
+      if($mante->pdfs->count()<=0){
+        $request->validate([
+          'pdfs' =>'required',
+          'pdfs.*'=>'required|mimes:pdf',
+        ]);
+      }
+      try {
+        $mante->tipo=$request->tipo;
+        $mante->proveedor=$request->proveedor;
+        $mante->fecha=$request->fecha;
+        $mante->comentarios=$request->comentario;
+        $mante->update();
+        if($request->hasFile('pdfs')){
+          foreach($request->file('pdfs') as $pdf){
+            $path=$pdf->storeAs('/mantenimientos/pdfs/'.$mante->manteActivos->activo->tipos->giro->nombre.'/',$mante->id."_".time()."_".$pdf->getClientOriginalName(),'public');
+            $archivo=new MantenimientoArchivo();
+            $archivo->mantenimiento_id=$mante->id;
+            $archivo->name=$pdf->getClientOriginalName();
+            $archivo->extension=$pdf->getClientOriginalExtension();
+            $archivo->type=$pdf->getMimeType();
+            $archivo->path=$path;
+            $archivo->save();
+          }
+        }
+        if($request->hasFile('foto')){
+          foreach($request->file('foto') as $foto){
+            $path=$foto->storeAs('/mantenimientos/fotos/'.$mante->manteActivos->activo->tipos->giro->nombre.'/',$mante->id."_".time()."_".$foto->getClientOriginalName(),'public');
+            $archivo=new MantenimientoArchivo();
+            $archivo->mantenimiento_id=$mante->id;
+            $archivo->name=$foto->getClientOriginalName();
+            $archivo->extension=$foto->getClientOriginalExtension();
+            $archivo->type=$foto->getMimeType();
+            $archivo->path=$path;
+            $archivo->save();
+          }
+        }
+        $manteActivo=$mante->manteActivos;
+        $manteActivo->ultimo_mante=$request->fecha;
+        $manteActivo->proximo_mante=Carbon::create($request->fecha)->addDays($manteActivo->frecuencia->dias)->toDateString();
+        $manteActivo->update();
+        return to_route('mante',$manteActivo->activo->tipos->id_giro);
+      } catch (Exception $e) {
+        return back()->withInput()->withErrors(['error'=> 'Error al actualizar la información: '.$e->getMessage()]);
+
+      }
     }
 }
