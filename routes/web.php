@@ -11,6 +11,7 @@ use App\Http\Controllers\MobiliarioEquipoController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TipoController;
+use App\Http\Controllers\UrlsPublicasController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -128,9 +129,9 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('Mantenimiento/{activo}/create','create')->name('mante.create');
             Route::post('Mantenimientos/store/{activo}','store')->name('mante.store');
             Route::patch('Mantenimiento/update_prox_mante/{activo}','updateProxMante')->name('mante.updateProx');
-            
             Route::get('Mantenimiento/edit/{mante}','edit')->name('mante.edit');
             Route::patch('Mantenimiento/update/{mante}','update')->name('mante.update');
+            Route::get('Mantenimiento/{activo}/historico','historico')->name('mante.history');
         });
 
         //controlador de servicios de petiones
@@ -149,10 +150,8 @@ Route::controller(ServiceController::class)->group(function(){
     Route::get('/service/mantenimiento/{id}','getManto')->name('service.manto');
 });
 
-Route::controller(ManteActivosController::class)->group(function(){
+Route::controller(UrlsPublicasController::class)->group(function(){
     Route::get('/mantenimiento/show/{mante}/public','publicShow')->name('manteAct.show.public');
-});
-Route::controller(MantenimientosController::class)->group(function(){
-    Route::get('Mantenimiento/{activo}/historico','historico')->name('mante.history');
+    Route::get('/public/Mantenimiento/{activo}/historico','historico')->name('public.mante.history');
 });
 require __DIR__.'/auth.php';
