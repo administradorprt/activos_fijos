@@ -19,7 +19,9 @@ class ServiceController extends Controller
   private $sucUsers;
   public function __construct()
   {
-  $this->sucUsers=Auth::user()->empleado->sucursales;
+    if(Auth::user()){
+      $this->sucUsers=Auth::user()->empleado->sucursales;
+    }
   }
   public function getActivos(){
       return Activo::all()->toJson();
