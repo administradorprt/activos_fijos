@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use App\Models\Activo;
 use App\Models\DeptosJoin;
+use App\Models\Empleado;
 use App\Models\JoinPuesto;
+use App\Models\User;
 use App\Models\UsersJoin;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +35,7 @@ class UpdateActivos extends Command
         try {
             $activos=Activo::where('res_actualizado',0)->get();
             $activosCre=Activo::where('cre_actualizado',0)->get();
-            $activosPuestos=Activo::where('ps_actualizado',0)->get();
+            //$activosPuestos=Activo::where('ps_actualizado',0)->get();
             $activosDeptos=Activo::where('depto_actualizado',0)->get();
             foreach ($activos as $activo) {
                 $empAsignado=UsersJoin::firstwhere('id_r',$activo->responsable_id);
@@ -41,25 +43,35 @@ class UpdateActivos extends Command
                     $activo->responsable_id=$empAsignado->id_c;
                     $activo->res_actualizado=1;
                     $activo->save();
+                    //actualizamos el puesto del activo según el puesto del empleado asignado
+                    if(isset($activo->empleado)){
+                        $activo->puesto_id=$activo->empleado->id_puesto;
+                        $activo->ps_actualizado=1;
+                        $activo->save();
+                    }
                 }else{
-                    $activo->responsable_id=null;
-                    $activo->save();
+                    /* $activo->responsable_id=null;
+                    $activo->save(); */
                 }
             }
             
             foreach ($activosCre as $activo) {
                 $empCreador=UsersJoin::firstwhere('id_r',$activo->created_user);
                 if (isset($empCreador)) {
-                    $activo->created_user=$empCreador->id_c;
-                    $activo->cre_actualizado=1;
-                    $activo->save();
+                    $emp=Empleado::firstWhere('id_empleado',$empCreador->id_c);
+                    $us=User::firstWhere('n_empleado',$emp->n_empleado);
+                    if(isset($us)) {
+                        $activo->created_user=$us->id;
+                        $activo->cre_actualizado=1;
+                        $activo->save();
+                    }
                 }else{
-                    $activo->created_user=null;
-                    $activo->save();
+                    /* $activo->created_user=null;
+                    $activo->save(); */
                 }
             }
 
-            foreach ($activosPuestos as $activo) {
+            /* foreach ($activosPuestos as $activo) {
                 $psId=JoinPuesto::firstwhere('id_r',$activo->puesto_id);
                 if (isset($psId)) {
                     $activo->puesto_id=$psId->id_c;
@@ -69,7 +81,7 @@ class UpdateActivos extends Command
                     $activo->puesto_id=null;
                     $activo->save();
                 }
-            }
+            } */
 
             foreach ($activosDeptos as $activo) {
                 $deptoId=DeptosJoin::firstwhere('id_r',$activo->depto_id);
@@ -78,8 +90,8 @@ class UpdateActivos extends Command
                     $activo->depto_actualizado=1;
                     $activo->save();
                 }else{
-                    $activo->departamento_id=null;
-                    $activo->save();
+                    /* $activo->departamento_id=null;
+                    $activo->save(); */
                 }
             }
     
