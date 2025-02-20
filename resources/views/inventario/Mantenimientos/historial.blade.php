@@ -40,9 +40,7 @@
                           <div class="form-group">
                               <div class="" style="margin-bottom: 1em; margin-right: 2em;">
                                   <div class="img_galery">
-                                      <a :href="'{{ asset('storage') }}/'+img.path" target="_blank">
-                                          <img class="upd_img figure-img img-fluid rounded img-thumbnail" height="100px" width="100px" :src="'{{ asset('storage') }}/'+img.path"/>
-                                      </a>
+                                    <img class="upd_img figure-img img-fluid rounded img-thumbnail" height="100px" width="100px" :src="'{{ asset('storage') }}/'+img.path" onClick="reply_click()"/>
                                   </div>
                               </div>
                           </div>
@@ -79,7 +77,12 @@
     
   </div>
 </div>
-@vite(['public/css/spinner.css','public/css/acordeon.css'])
+<div id="myModal" class="modal">
+  <button onclick="closeModal()" class="close">&times;</span></button>
+  <img class="modal-content" id="img01">
+  <div id="caption"></div>
+</div>
+@vite(['public/css/spinner.css','public/css/acordeon.css','public/css/modal.css'])
 <script>
   document.addEventListener('alpine:init', () => {
       Alpine.data('mantenimiento', () => ({
