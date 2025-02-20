@@ -118,7 +118,7 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-        'resguardo' => [
+        /* 'resguardo' => [
             'driver'    => 'mysql',
             'host'      => 'localhost',
             'database'  => 'resguardo',
@@ -129,7 +129,7 @@ return [
             'prefix'    => '',
             'strict'    => true,
             'engine' => null,
-        ],
+        ], */
 
         'mariadb' => [
             'driver' => 'mariadb',
