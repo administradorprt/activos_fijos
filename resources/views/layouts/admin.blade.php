@@ -127,6 +127,7 @@
                 <li><a href="/admin/inventario/MaquinariaEquipo/Reporte"><i class="fa fa-circle-o"></i> reportes</a></li>
                 <li><a href="/admin/inventario/MaquinariaEquipo/Responsivas"><i class="fa fa-circle-o"></i> responsiva</a></li>
                 <li><a href="/admin/inventario/CargarArchivoMasivaMAE"><i class="fa fa-files-o"></i> Carga Masiva</a></li>
+                <li><a href="{{route('mante',4)}}"><i class="fa fa-circle-o"></i> Mantenimientos</a></li>
                 @if(auth()->user()->role_id < 3 || auth()->user()->role_maq ==2)
                 @endif
               </ul>
