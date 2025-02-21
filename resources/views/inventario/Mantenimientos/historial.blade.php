@@ -19,7 +19,7 @@
             <input type="text" name="proveedor" class="form-control" placeholder="tipo de manto." :value="mante.proveedor" readonly="">
     </x-row-element>
     <x-row-element>
-        <label for="clase_manto">Proveedor</label>
+        <label for="clase_manto">Tipo de mantenimiento</label>
             <input type="text" name="clase_manto" class="form-control" placeholder="tipo de manto." :value="
             mante.tipo==1?'Correctivo':'Preventivo'
             " readonly="">
