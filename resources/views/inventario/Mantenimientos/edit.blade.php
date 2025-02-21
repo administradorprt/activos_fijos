@@ -30,7 +30,7 @@
 				</x-row-element>
 				<x-row-element>
 					<label for="fecha">Fecha del mantenimiento</label>
-						<input type="date" name="fecha" class="form-control" required min="{{$mante->fecha}}" value="{{$mante->fecha}}">
+						<input type="date" name="fecha" class="form-control" required value="{{$mante->fecha}}">
 				</x-row-element>
 				<x-row-element>
 					<label for="pdfs">Pdfs</label>
