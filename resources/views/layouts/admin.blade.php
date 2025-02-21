@@ -296,9 +296,9 @@
       <!--Fin-Contenido-->
       <footer class="main-footer">
         <div class="pull-right hidden-xs">
-          <b>Version</b> 1.5
+          <b>Versión</b> 2.0
         </div>
-        <strong>Grupo PRT &copy; 2023 <a href="#">Grupo PRT</a>.</strong> All rights reserved.
+        <strong>Grupo PRT &copy; {{date('Y')}} <a href="#">Grupo PRT</a>.</strong> All rights reserved.
       </footer>
     <!-- jQuery 2.1.4 -->
     {{-- <script src="{{asset('js/jQuery-2.1.4.min.js')}}"></script> --}}
