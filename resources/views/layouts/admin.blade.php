@@ -145,6 +145,7 @@
                   <li><a href="/admin/inventario/Herramientas/Responsivas"><i class="fa fa-circle-o"></i> responsiva</a></li>
                   <li><a href="/admin/inventario/CargarArchivoMasivaHER"><i class="fa fa-files-o"></i> Carga Masiva</a></li>
                   <li><a href="{{route('mante',5)}}"><i class="fa fa-circle-o"></i> Mantenimientos</a></li>
+                  <li><a href="{{route('carritos',5)}}"><i class="fa fa-circle-o"></i> Carritos</a></li>
                 @endif
               </ul>
             </li>
