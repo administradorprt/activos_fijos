@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CargaController;
+use App\Http\Controllers\CarritosController;
 use App\Http\Controllers\EquipoComputoController;
 use App\Http\Controllers\EquipoTransporteController;
 use App\Http\Controllers\HerramientasController;
@@ -133,6 +134,12 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::patch('Mantenimiento/update/{mante}','update')->name('mante.update');
             Route::get('Mantenimiento/{activo}/historico','historico')->name('mante.history');
         });
+        //carritos
+        Route::controller(CarritosController::class)->group(function(){
+            Route::get('Carritos/{tipo}','index')->name('carritos');
+            Route::get('Carritos/{tipo}/create','create')->name('carritos.create');
+            Route::post('Carritos/store/{tipo}','store')->name('carritos.store');
+        });
 
         //controlador de servicios de petiones
         Route::controller(ServiceController::class)->group(function(){
@@ -141,6 +148,7 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('service/get/activos/{sucursal}/{giro}','getActivosBySucursal')->name('service.getActivosBySuc');
             Route::get('service/mantenimiento/activos/{id}/qr','getQr')->name('service.manteAct.qr');
             Route::delete('service/mantenimiento/archivos/delete/{mante}','delArchivosMante')->name('service.mante.delArchivos');
+            Route::get('service/empleados/{sucursal}','getEmpleadosBySucursal')->name('service.empleados.suc');
         });
     });
 });
