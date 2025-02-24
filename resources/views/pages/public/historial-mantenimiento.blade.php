@@ -79,7 +79,7 @@
     <script src="{{asset('js/jquery-3.7.1.js')}}"></script>
 {{--     <script src="{{asset('js/fslightbox.js')}}"></script> --}}
     <script src="{{asset('js/funciones.js')}}"></script>
-    @vite(['public/css/spinner.css','public/css/acordeon.css','public/css/modal.css'])
+    
     <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('mantenimiento', () => ({
