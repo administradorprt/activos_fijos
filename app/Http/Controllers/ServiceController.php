@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activo;
+use App\Models\Empleado;
 use App\Models\ManteActivo;
 use App\Models\Mantenimiento;
 use App\Models\MantenimientoArchivo;
@@ -42,7 +43,7 @@ class ServiceController extends Controller
     try{
       $mantelist=ManteActivo::all()->pluck('activo_id');
       $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
-      return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$mantelist)->orderBy('descripcion','ASC')->orderBy('num_equipo','ASC')->get()->toJson();
+      return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$mantelist)->orderBy('descripcion','ASC')->orderBy('num_equipo','ASC')->select('id','descripcion','num_equipo')->get()->toJson();
     }catch(Exception $e){
       return response()->json(['error' => $e->getMessage()], 400);
     }
@@ -82,6 +83,13 @@ class ServiceController extends Controller
     } catch (Exception $e) {
       return response()->json(['error' => $e->getMessage()], 400);
 
+    }
+  }
+  public function getEmpleadosBySucursal($sucursal){
+    try {
+      return Empleado::where([['id_sucursal_principal',$sucursal],['status',1]])->orderBy('nombres','ASC')->select('id_empleado','n_empleado','nombres','apellido_m','apellido_p','id_puesto','id_sucursal_principal',)->get()->toJson();
+    } catch (Exception $e) {
+      return response()->json(['error' => $e->getMessage()], 400);
     }
   }
 }
