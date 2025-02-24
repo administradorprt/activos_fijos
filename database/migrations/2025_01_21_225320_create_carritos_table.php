@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('carritos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('giro_id');
+            $table->foreignId('sucursal_id')->index();
             $table->foreignId('user_asignado')->index();
             $table->string('nombre',100);
             $table->string('qr',255)->nullable()->comment('qr del carrito');
             $table->softDeletes();
             $table->timestamps();
+            $table->foreign('giro_id')->references('id_giro')->on('giros')->onDelete('cascade');
         });
     }
 
