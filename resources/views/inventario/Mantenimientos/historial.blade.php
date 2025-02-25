@@ -82,7 +82,9 @@
   <img class="modal-content" id="img01">
   <div id="caption"></div>
 </div>
-@vite(['public/css/spinner.css','public/css/acordeon.css','public/css/modal.css'])
+<link rel="stylesheet" href="{{asset('css/spinner.css')}}">
+<link rel="stylesheet" href="{{asset('css/acordeon.css')}}">
+<link rel="stylesheet" href="{{asset('css/modal.css')}}">
 <script>
   document.addEventListener('alpine:init', () => {
       Alpine.data('mantenimiento', () => ({
