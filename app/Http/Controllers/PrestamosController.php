@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\PrestamosExport;
 use App\Models\Prestamo;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,7 +18,11 @@ class PrestamosController extends Controller
 		$this->sucUsers=Auth::user()->empleado->sucursales;
     }
     public function index($tipo){
-        $prestamos=Prestamo::where('fecha_devuelto',null)->get();
+        $prestamos=Prestamo::where('fecha_devuelto',null)->whereHas('activo',function(Builder $activo)use($tipo){
+            $activo->whereIn('sucursal_id', $this->sucUsers->pluck('id_sucursal'))->whereHas('tipos',function(Builder $tp)use($tipo){
+                $tp->whereIn('sucursal_id', $this->sucUsers->pluck('id_sucursal'))->where('id_giro', $tipo);
+            });
+        })->get();
         return view('inventario.Prestamos.index',compact('tipo', 'prestamos'));
     }
     public function create($tipo){

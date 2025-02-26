@@ -6,6 +6,7 @@ use App\Models\Activo;
 use App\Models\Prestamo;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
@@ -27,11 +28,12 @@ class PrestamosExport implements FromQuery,WithMapping,WithHeadings,ShouldAutoSi
     /**
     * @param $giro int
     */
-    private $giro,$fecha_in,$fecha_fin;
+    private $giro,$fecha_in,$fecha_fin,$sucursales;
     public function __construct($giro,$fecha_in,$fecha_fin) {
         $this->giro = $giro;
         $this->fecha_in = $fecha_in;
         $this->fecha_fin = $fecha_fin;
+        $this->sucursales=Auth::user()->empleado->sucursales;
     }
     public function headings(): array
     {
@@ -93,8 +95,8 @@ class PrestamosExport implements FromQuery,WithMapping,WithHeadings,ShouldAutoSi
             Carbon::create($this->fecha_fin)->endOfDay()->toDateTimeString()
         ];
         return Prestamo::whereBetween('fecha',$fechas)->whereHas('activo',function(Builder $activo){
-            $activo->whereHas('tipos',function(Builder $tipo){
-                $tipo->where('id_giro', $this->giro);
+            $activo->whereIn('sucursal_id',$this->sucursales->pluck('id_sucursal'))->whereHas('tipos',function(Builder $tipo){
+                $tipo->whereIn('sucursal_id',$this->sucursales->pluck('id_sucursal'))->where('id_giro', $this->giro);
             });
         });
     }
