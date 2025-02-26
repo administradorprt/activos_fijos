@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('activo_id');
             $table->foreignId('user_id')->index();
             $table->dateTime('fecha');
-            $table->dateTime('fecha_devuelto');
+            $table->dateTime('fecha_devuelto')->nullable();
             $table->string('detalles',255)->nullable();
             $table->softDeletes();
             $table->timestamps();
