@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Gestor de gastos</title>
+        <title>Activos fijos</title>
         <link rel="stylesheet" href="{{asset('css/spinner.css')}}">
         <link rel="stylesheet" href="{{asset('css/acordeon.css')}}">
         <link rel="stylesheet" href="{{asset('css/modal.css')}}">
