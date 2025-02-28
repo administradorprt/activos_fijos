@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Activo;
 use App\Models\ActivosCarrito;
 use App\Models\Cajon;
 use App\Models\Carrito;
+use App\Models\Empleado;
 use App\Models\Giro;
+use App\Models\Tipo;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,7 +23,8 @@ class CarritosController extends Controller
 		$this->sucUsers=Auth::user()->empleado->sucursales;
     }
     public function index($tipo){
-        return view('inventario.Carritos.index',compact('tipo'));
+        $carritos=Carrito::where('giro_id',$tipo)->get();
+        return view('inventario.Carritos.index',compact('tipo','carritos'));
     }
     public function create($tipo){
         $sucursales=$this->sucUsers;
@@ -46,12 +50,11 @@ class CarritosController extends Controller
             $carrito->giro_id=$tipo;
             $carrito->sucursal_id=$request->sucursal;
             $carrito->user_asignado=$request->user;
-            $carrito->qr='23';
             $carrito->save();
             //guardamos los activos de cada cajon 
             foreach($request->carrito as $cajon){
                 $newCajon=new Cajon();
-                $newCajon->carrito_id=1;
+                $newCajon->carrito_id=$carrito->id;
                 $newCajon->name=$cajon['name'];
                 $newCajon->status=1;
                 $newCajon->save();
@@ -68,5 +71,69 @@ class CarritosController extends Controller
             Log::error('error',['message' => $e->getMessage()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+    public function show(Carrito $carrito) {
+        return view('inventario.Carritos.show',compact('carrito'));
+    }
+    public function edit(Carrito $carrito) {
+        $sucursales=$this->sucUsers;
+        $empleados=Empleado::where([['status',1],['id_sucursal_principal',$carrito->sucursal_id]])->orderBy('nombres','ASC')->select('id_empleado','n_empleado','nombres','apellido_m','apellido_p','id_puesto','id_sucursal_principal',)->get();
+        return view('inventario.Carritos.edit',compact('carrito','sucursales','empleados'));
+    }
+    public function update(Request $request, Carrito $carrito) {
+        $request->validate([
+            'titulo'=>'required|min:3',
+            'sucursal'=>'required',
+            'user'=>'required',
+        ]);
+        try {
+            $carrito->nombre=$request->titulo;
+            $carrito->sucursal_id=$request->sucursal;
+            $carrito->user_asignado=$request->user;
+            $carrito->update();
+
+            if($request->cajones){
+                foreach ($request->cajones as $key => $cajon) {
+                    foreach ($cajon as $activo){
+                        ActivosCarrito::firstWhere([['activo_id',$activo],['cajon_id',$key]])->delete();
+                    }
+                }
+            }
+            return to_route('carritos.edit',$carrito->id);
+        } catch (Exception $e) {
+            return back()->withInput()->withErrors(['error'=> 'Error al guardar el registro: '.$e->getMessage()]);
+        }
+
+    }
+    /**
+     * Función para eliminar un cajon junto con sus activos asignados
+     */
+    public function cajonDelete(Cajon $cajon){
+        try {
+            $carrito=$cajon->carrito_id;
+            ActivosCarrito::where('cajon_id',$cajon->id)->delete();
+            $cajon->delete();
+            return to_route('carritos.edit',$carrito);
+        } catch (Exception $e) {
+            return back()->withInput()->withErrors(['error'=> 'Error al guardar el registro: '.$e->getMessage()]);
+        }
+    }
+    public function cajonAddActivos(Cajon $cajon){
+        $cajones=Cajon::where('carrito_id',$cajon->carrito_id)->get()->pluck('id');
+        $tipos=Tipo::where('id_giro',$cajon->carrito->giro_id)->get()->pluck('id_tipo');
+        $actsCajones=ActivosCarrito::all()->pluck('activo_id');
+        $activos=Activo::whereIn('tipo_id',$tipos)->whereNotIn('id',$actsCajones)->get();
+        return view('inventario.Carritos.addActivoCarrito', compact('activos', 'cajon'));
+    }
+    public function cajonActivosStore(Request $request,Cajon $cajon){
+        $request->validate(['activo'=>'required|array|min:1']);
+        foreach($request->activo as $activo) {
+            $actCajon=new ActivosCarrito();
+            $actCajon->activo_id=$activo;
+            $actCajon->cajon_id=$cajon->id;
+            $actCajon->status=1;
+            $actCajon->save();
+        }
+        return to_route('carritos.edit',$cajon->carrito_id);
     }
 }
