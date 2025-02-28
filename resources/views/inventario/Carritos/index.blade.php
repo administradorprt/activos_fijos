@@ -15,67 +15,24 @@
 	</div>
 </div>
 <div>
-	{{-- <table id="table_mante" class="display">
+	<table id="table_carritos" class="display" style="width: 100%">
 		<thead>
 			<tr>
 				<th>Sucursal</th>
-				<th>Num. de equipo</th>
-				<th>Descripción</th>
-				<th>Ubicación</th>
-				<th>Frec. mantenimiento</th>
-				<th>Último mantenimiento</th>
-				<th>Próximo mantenimiento</th>
+				<th>Carrito</th>
+				<th>Usuario</th>
 				<th>opciones</th>
 			</tr>
 		</thead>
 		<tbody>
-			@foreach ($manteList as $mante)
+			@foreach ($carritos as $carrito)
 				<tr>
-					<td>{{$mante->activo->sucursal->empresa->alias}} - {{$mante->activo->sucursal->nombre}}</td>
-					<td>{{$mante->activo->num_equipo}}</td>
-					<td>{{str($mante->activo->descripcion)->words(4,'...')}}</td>
-					<td>{{str($mante->ubicacion)->words(3),'...'}}</td>
-					<td>{{$mante->frecuencia->name}}</td>
-					<td>{{$mante->ultimo_mante}}</td>
-					<td>{{$mante->proximo_mante}}</td>
+					<td>{{$carrito->sucursal->empresa->alias}} - {{$carrito->sucursal->nombre}}</td>
+					<td>{{$carrito->nombre}}</td>
+					<td>{{$carrito->asignado->nombres}} {{$carrito->asignado->apellido_p}} {{$carrito->asignado->apellido_m}}</td>
 					<td>
-						<a href="{{route('manteAct.show',$mante->id)}}"><button class="btn btn-info">Ver</button></a>
-						<div class="dropdown">
-							<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-								<i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-								<span class="caret"></span>
-							</button>
-							<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-								<li>
-									<a href="{{route('mante.create',$mante->id)}}">
-										<i class="fa fa-plus-circle" aria-hidden="true"></i>Mantenimiento
-									</a>
-								</li>
-								<li>
-									@if ($mante->lastMante)	
-										@if ($mante->user_created == Auth::user()->id)
-											<a href="{{route('mante.edit',$mante->lastMante->id)}}">
-												<i class="fa fa-pencil" aria-hidden="true"></i>Editar
-											</a>
-										@endif
-									@endif
-								</li>
-								<li>
-									@if($mante->status==1)
-										<a href="" data-target="#modal-delete-{{$mante->id}}" data-toggle="modal">
-											<i class="fa fa-trash" aria-hidden="true"></i>Baja
-										</a>
-									@else
-										<a href="" data-target="#modal-activate-{{$mante->id}}" data-toggle="modal">Activar</a>
-									@endif
-								</li>
-								@if ($mante->frecuencia->manual)
-									<li>
-										<a href="" data-target="#modal-fecha-{{$mante->id}}" data-toggle="modal">Definir manto.</a>
-									</li>
-								@endif
-							</ul>
-						</div>
+						<a href="{{route('carritos.show',$carrito->id)}}"><button class="btn btn-info">Ver</button></a>
+						<a href="{{route('carritos.edit',$carrito->id)}}"><button class="btn btn-primary">Editar</button></a>
 					</td>
 				</tr>
 			@endforeach
@@ -86,18 +43,14 @@
 				<th></th>
 				<th></th>
 				<th></th>
-				<th></th>
-				<th></th>
-				<th></th>
-				<th></th>
 			</tr>
 		</tfoot>
-	</table> --}}
+	</table>
 </div>
-{{-- <link rel="stylesheet" href="{{asset('css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{asset('css/datatables.min.css')}}">
 <script src="{{asset('js/datatables.min.js')}}"></script>
 <script>
-	new DataTable('#table_mante',{
+	new DataTable('#table_carritos',{
 		language:{
 			info:'Mostrando página _PAGE_ de _PAGES_',
 			infoEmpty:'No hay datos disponibles',
@@ -114,7 +67,7 @@
 		stateSave:true,
 		//filtro por columna
 		initComplete: function () {	
-			this.api().columns([0,4]).every(function () {
+			this.api().columns([0]).every(function () {
 				let column = this;
 				
 				// Create select element
@@ -134,5 +87,5 @@
 			});
 		}
 	});
-</script> --}}
+</script>
 @endsection
