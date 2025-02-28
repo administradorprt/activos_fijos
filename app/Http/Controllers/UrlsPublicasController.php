@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Carrito;
 use App\Models\ManteActivo;
 use Illuminate\Http\Request;
 
@@ -26,5 +27,11 @@ class UrlsPublicasController extends Controller
     ]);
     return view('pages.public.historial-mantenimiento',compact('activo'));
   }
-
+  public function showCarritoPublic(Request $request,Carrito $carrito) {
+    if(! $request->hasValidSignature()){
+      abort(401);
+    }
+    $carrito->load('cajones');
+    return view('pages.public.carritoShow', compact('carrito'));
+  }
 }
