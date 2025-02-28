@@ -148,17 +148,26 @@ Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('Carritos/{tipo}','index')->name('carritos');
             Route::get('Carritos/{tipo}/create','create')->name('carritos.create');
             Route::post('Carritos/store/{tipo}','store')->name('carritos.store');
+            Route::get('Carritos/show/{carrito}','show')->name('carritos.show');
+            Route::get('Carritos/edit/{carrito}','edit')->name('carritos.edit');
+            Route::patch('Carritos/update/{carrito}','update')->name('carritos.update');
+            Route::delete('Carritos/cajon/delete/{cajon}','cajonDelete')->name('carritos.cajon.delete');
+            Route::get('/Carritos/cajon/{cajon}/add','cajonAddActivos')->name('carritos.cajon.add');
+            Route::post('/Carritos/cajon/{cajon}/add','cajonActivosStore')->name('carritos.cajon.store');
         });
 
         //controlador de servicios de petiones
         Route::controller(ServiceController::class)->group(function(){
             Route::get('service/get/activos','getActivos')->name('service.getActivos');
             Route::get('service/get/activos/{giro}','getActivosByType')->name('service.getActivosType');
-            Route::get('service/get/activos/{sucursal}/{giro}','getActivosBySucursal')->name('service.getActivosBySuc');
+            Route::get('service/get/mante/activos/{sucursal}/{giro}','getActivosBySucursalforMante')->name('service.getActivosBySuc');
             Route::get('service/mantenimiento/activos/{id}/qr','getQr')->name('service.manteAct.qr');
             Route::delete('service/mantenimiento/archivos/delete/{mante}','delArchivosMante')->name('service.mante.delArchivos');
             Route::get('service/empleados/{sucursal}','getEmpleadosBySucursal')->name('service.empleados.suc');
             Route::get('service/prestamos/get/activos/{sucursal}/{giro}','activosParaPrestamo')->name('service.prestamos.activos');
+            Route::get('service/carritos/{carrito}/qr','getCarritoQr')->name('service.carritos.qr');
+            Route::get('service/get/activos/{sucursal}/{giro}','getActivosBySucursal')->name('service.ActivosBySuc');
+            Route::get('service/carritos/activos/{sucursal}/{giro}','actsDispCarritos')->name('service.carritos.activosDisp');
         });
     });
 });
@@ -171,5 +180,6 @@ Route::controller(ServiceController::class)->group(function(){
 Route::controller(UrlsPublicasController::class)->group(function(){
     Route::get('/mantenimiento/show/{mante}/public','publicShow')->name('manteAct.show.public');
     Route::get('/public/Mantenimiento/{activo}/historico','historico')->name('public.mante.history');
+    Route::get('/carrito/show/{carrito}','showCarritoPublic')->name('carritos.show.public');
 });
 require __DIR__.'/auth.php';
