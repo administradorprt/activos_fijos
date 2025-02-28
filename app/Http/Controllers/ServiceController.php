@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activo;
+use App\Models\ActivosCarrito;
+use App\Models\Carrito;
 use App\Models\Empleado;
 use App\Models\ManteActivo;
 use App\Models\Mantenimiento;
@@ -40,7 +42,7 @@ class ServiceController extends Controller
    * @param  integer $sucursal id de la sucursal
    * @param integer $giro id del giro (mantenimento, herramientas...)
    */
-  public function getActivosBySucursal($sucursal,$giro){
+  public function getActivosBySucursalforMante($sucursal,$giro){
     try{
       $mantelist=ManteActivo::all()->pluck('activo_id');
       $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
@@ -101,6 +103,50 @@ class ServiceController extends Controller
       $preslist=Prestamo::where('fecha_devuelto',null)->get()->pluck('activo_id');
       $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
       return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$preslist)->orderBy('descripcion','ASC')->orderBy('num_equipo','ASC')->select('id','descripcion','num_equipo')->get()->toJson();
+    }catch(Exception $e){
+      return response()->json(['error' => $e->getMessage()], 400);
+    }
+  }
+  /**
+   * Función para obtener el QR del carrito
+   */
+  public function getCarritoQr(Carrito $carrito){
+    try {
+      if($carrito->qr){
+        return response()->json(['path'=>asset('storage/'.$carrito->qr)]);
+      }else{
+        //generamos y guardamos el QR
+        $qr=QrCode::size(250)->margin(2)->format('svg')->generate(URL::signedRoute('carritos.show.public',$carrito->id));
+        Storage::disk('public')->put('/carritos/qrs/Qr_carrito_'.$carrito->id.'.svg',$qr);
+        //Actualizamos el valor del qr del carrito
+        $carrito->qr='/carritos/qrs/Qr_carrito_'.$carrito->id.'.svg';
+        $carrito->save();
+        return response()->json(['path'=>asset('storage/'.$carrito->qr)]);
+      }
+    } catch (Exception $e) {
+      return response()->json(['error' => $e->getMessage()], 400);
+    }
+  }
+  /**
+   * Función para obtener los activos disponibles de una sucursal
+   */
+  public function getActivosBySucursal($sucursal,$giro){
+    try{
+      
+      $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
+      return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->orderBy('descripcion','ASC')->orderBy('num_equipo','ASC')->select('id','descripcion','num_equipo')->get()->toJson();
+    }catch(Exception $e){
+      return response()->json(['error' => $e->getMessage()], 400);
+    }
+  }
+  /**
+   * Función para obtener los activos que disponibles que NO se encuientran registrados en los carritos
+   */
+  public function actsDispCarritos($sucursal,$giro){
+    try{
+      $acts=ActivosCarrito::all()->pluck('activo_id');
+      $tipos=Tipo::where([['id_giro',$giro],['sucursal_id',$sucursal]])->get()->pluck('id_tipo');
+      return Activo::where([['sucursal_id',$sucursal],['estado',1]])->whereIn('tipo_id',$tipos)->whereNotIn('id',$acts)->orderBy('descripcion','ASC')->orderBy('num_equipo','ASC')->select('id','descripcion','num_equipo')->get()->toJson();
     }catch(Exception $e){
       return response()->json(['error' => $e->getMessage()], 400);
     }
