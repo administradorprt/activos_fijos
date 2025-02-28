@@ -38,40 +38,51 @@
                     </select>
                 </x-row-element>
 			</div>
+            <div class="loader" x-cloak x-show="loading"></div>
             <template x-for="(cajon,index) in carrito" :key="cajon.id">
-                <div>
+                <div x-data="cajon">
                     <fieldset>
                         <legend><span x-text="`Cajón # ${index+1}`"></span></legend>
-                        <div class="row">
-                            <x-row-element>
-                                <label :for="`etiqueta_${cajon.id}`">Etiqueta</label>
-                                <input type="text" name="etiqueta" :id="`etiqueta_${cajon.id}`" class="form-control" placeholder="Etiqueta del cajón..." required x-model="cajon.name">
-                            </x-row-element>
-                            <div x-cloack x-show="index>0">
-    
-                                <x-row-element>
-                                    <button type="button" class="btn btn-danger" @click="delCajon(cajon.id)">
-                                        <i class="fa fa-trash" aria-hidden="true"></i>
-                                    </button>
-                                </x-row-element>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <x-row-element>
+                                        <div class="input-group">
+                                            <label :for="`etiqueta_${cajon.id}`" class="input-group-addon">Etiqueta</label>
+                                            <input type="text" name="etiqueta" :id="`etiqueta_${cajon.id}`" class="form-control" placeholder="Etiqueta del cajón..." required x-model="cajon.name">
+                                        </div>
+                                    </x-row-element>
+                                    <div x-cloack x-show="index>0">
+                                        <x-row-element>
+                                            <button type="button" class="btn btn-danger" @click="delCajon(cajon.id)">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        </x-row-element>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div class="input-group">
+                                    <label class="input-group-addon" :for="`srch_${cajon.id}`"><i class="fa fa-search" aria-hidden="true"></i>
+                                    </label>
+                                    <input type="text" :id="`srch_${cajon.id}`" class="form-control" placeholder="Buscar..." aria-describedby="sizing-addon2" x-model="search" @keyup="filter(event)">
+                                </div>
+                                <div class="row" style="overflow-y: auto;max-height: 25rem;">
+                                    <template x-for="activo in actList" :key="activo.id">
+                                    <x-row-element>
+                                            <label >
+                                                <input type="checkbox" :name="`activo[]`" :id="`c_${cajon.id}_act_${activo.id}`" :value="activo.id" x-model="cajon.acts">
+                                                <span x-text="`${activo.num_equipo} - ${activo.descripcion}`"></span>
+                                            </label>
+                                    </x-row-element>
+                                    </template>
+                                </div>
                             </div>
                         </div>
-                        <div class="loader" x-cloak x-show="loading"></div>
-                        <div class="row" style="overflow-y: auto;max-height: 25rem;">
-                            <template x-for="activo in activos" :key="activo.id">
-                            <x-row-element>
-                                    <label >
-                                        <input type="checkbox" :name="`activo[]`" :id="`act_${activo.id}`" :value="activo.id" x-model="cajon.acts">
-                                        <span x-text="activo.descripcion"></span>
-                                    </label>
-                            </x-row-element>
-                            </template>
-                        </div>
                     </fieldset>
-                    <hr>
                 </div>
             </template>
-            <div class="row">
+            <div class="row" x-cloak x-show="carrito.length>0">
                 <x-row-element>
                     <button type="button" class="btn btn-success" @click="addCajon()">
                         <i class="fa fa-plus" aria-hidden="true"></i>
@@ -81,18 +92,18 @@
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="form-group">
 					<button class="btn btn-primary" type="button" @click="enviar()">Guardar</button>
-                    <button class="btn btn-primary" >Guardar</button>
+                    {{-- <button class="btn btn-primary" >Guardar</button> --}}
 					<a href="{{ URL::previous() }}"><button class="btn btn-danger" type="button" >Cancelar</button></a>
 				</div>
 			</div>
 		</form>
 	</div>
 </div>
-@vite(['public/css/spinner.css'])
+<link rel="stylesheet" href="{{asset('css/spinner.css')}}">
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('mantenimiento', () => ({loading: false,
-            activos:[],users:[],manual:false,suc:'',emp:'',titulo:'',carrito:[{id:1,name:'',acts:[]}],count:1,errors:[],
+            activos:[],users:[],manual:false,suc:'',emp:'',titulo:'',carrito:[/* {id:1,name:'',acts:[]} */],count:1,errors:[],
             addCajon(){
                 this.count++;
                 this.carrito.push({id:this.count,name:'',acts:[]});
@@ -101,10 +112,10 @@
                 this.carrito=this.carrito.filter(cajon=>cajon.id!=id);
             },
 			async getActivos(event){
+                this.carrito=[];
                 this.loading=true;
-                this.carrito=[{id:1,name:'',acts:[]}];
 				const val=event.target.value;
-				const urlBase = @js(route('service.getActivosBySuc', ['giro' => $tipo, 'sucursal' => '__SUCURSAL__']));
+				const urlBase = @js(route('service.carritos.activosDisp', ['giro' => $tipo, 'sucursal' => '__SUCURSAL__']));
             	const url = urlBase.replace('__SUCURSAL__', val);
 				await this.getEmpleados(val);
 				const response=await fetch(url).finally(()=>{
@@ -113,6 +124,8 @@
 				response.ok
 				?this.activos=await response.json()
 				:console.error(`Error ${response.status}: ${response.statusText}`);
+                this.carrito=[{id:1,name:'',acts:[]}];
+
 			},
             async getEmpleados(sucursal){
                 const urlBase = @js(route('service.empleados.suc', ['sucursal' => '__SUCURSAL__']));
@@ -138,8 +151,8 @@
                 }).finally(()=>{this.loading=false;});
                 
 				response.ok
-				?console.log(await response.json())
-                /* window.location.href=@js(route('carritos',$tipo)) */
+				?/* console.log(await response.json()) */
+                window.location.href=@js(route('carritos',$tipo))
 				:this.error(await response.json());
 			},
             error(list){
@@ -147,6 +160,18 @@
                     this.errors.push(error[0]);
                 });
                 console.log(list.errors,this.errors);
+            }
+        })),
+        Alpine.data('cajon',()=>({
+            search:'',actList:[],
+            init(){
+                this.actList=this.activos;
+            },
+            filter(){
+                this.actList = this.activos.filter(act => 
+                    act.descripcion.toLowerCase().includes(this.search.toLowerCase()) ||
+                    act.num_equipo.toLowerCase().includes(this.search.toLowerCase())
+                );   
             }
         }))
     })
